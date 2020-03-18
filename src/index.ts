@@ -3,7 +3,7 @@
 function main() {
 
   // TODO: Update mainClass to your app's main class!
-  let mainCLass = require('./lightweight');
+  let mainClass = require('./lightweight');
 
 }
 main();

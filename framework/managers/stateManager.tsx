@@ -1,4 +1,5 @@
-import { Component, tsxlightinstance, tsxlight } from "./tsxlight";
+import { tsxlightinstance } from "../renderer/tsxRenderer";
+import { Component } from "../tsxlight";
 
 export type PageCallback = (pageID: string, baseComponent: Component<any, any>) => any;
 
@@ -10,8 +11,6 @@ export type Page = {
 
 export class StateManager {
 
-  public constructor(tsxlightInstanceIn: tsxlightinstance) { this.tsxlightInstance = tsxlightInstanceIn; };
-  public tsxlightInstance: tsxlightinstance;
   public static compToState: Map<string, any> = new Map<string, any>();
   public static stateHasInit: Map<string, boolean> = new Map<string, boolean>();
   public static registerCompStateInit(path: string) {

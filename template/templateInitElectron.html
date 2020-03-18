@@ -1,0 +1,13 @@
+<head>
+  <script>
+    let { callbackMessenger } = require("../scripts/electronEventMsg.js");
+    callbackMessenger("event");
+  </script>
+</head>
+
+<!-- #####TSXLIGHTIDHOOKHERE -->
+
+<body id="tsxlight-body">
+  <div id="tsxlight-app" onclick="callbackMessenger(event)">
+  </div>
+</body>

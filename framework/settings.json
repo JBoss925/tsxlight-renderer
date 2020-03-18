@@ -1,0 +1,10 @@
+{
+  "mode": "electron",
+  "port": "3000",
+  "socketPort": "4000",
+  "electronSettings": {
+    "windowWidth": "50%",
+    "windowHeight": "50%"
+  },
+  "expressSettings": {}
+}

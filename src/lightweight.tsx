@@ -1,6 +1,6 @@
 import { tsxlight, Component } from '../framework/tsxlight';
-import { PageManager } from '../framework/pageManager';
-import { StateManager } from '../framework/stateManager';
+import { PageManager } from '../framework/managers/pageManager';
+import { StateManager } from '../framework/managers/stateManager';
 import { inspect } from 'util';
 let fs = require('fs');
 
@@ -13,7 +13,14 @@ type LightState = {
   count: number
 }
 
-let x: any;
+let x: LightComponent;
+
+let z = 10;
+
+setTimeout(() => {
+  z = 1240;
+  x.forceUpdate();
+}, 17000);
 
 class LightComponent extends Component<LightProps, LightState>{
 
@@ -36,7 +43,7 @@ class LightComponent extends Component<LightProps, LightState>{
   }
 
   public render() {
-    return <div onClick={this.log}>Hello<p style={{ color: "red" }}>{this.state.count}</p></div>;
+    return <div onClick={this.log}>Hello<p style={{ paddingLeft: "20em", color: "red" }}>{this.state.count + z}</p></div>;
   }
 
 }
@@ -60,13 +67,12 @@ class LightComponent3 extends Component<LightProps, LightState> {
   }
 
   public render() {
-    return <LightComponent2 className="help123123" yeet="off245235">whateversdfasf!!</LightComponent2>
+    return <div id="pushItTotheLimit"><LightComponent2 className="help123123" yeet="off245235">whateversdfasf!!</LightComponent2></div>
   }
 
 }
 
 class LightComponent4 extends Component<LightProps, LightState> {
-
   public constructor(props: LightProps, state: LightState, key?: string | number | null | undefined) {
     super(props, state, key);
   }
@@ -87,20 +93,25 @@ tsxlight.transitionToPage("page1");
 
 setTimeout(() => {
   tsxlight.transitionToPage("page2");
+}, 4000);
+
+setTimeout(() => {
+  tsxlight.transitionToPage("page1");
 }, 8000);
 
 setTimeout(() => {
-  tsxlight.transitionToPage("page1");
-}, 12000);
-
-setTimeout(() => {
   x.setState({ count: 67 });
-}, 14000);
+}, 10000);
 
 setTimeout(() => {
   tsxlight.transitionToPage("page2");
-}, 16000);
+}, 12000);
 
 setTimeout(() => {
   tsxlight.transitionToPage("page1");
+}, 14000);
+
+
+setTimeout(() => {
+  x.transitionToPage("page2");
 }, 18000);

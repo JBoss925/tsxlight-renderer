@@ -3,7 +3,7 @@
     "jsx": "react",
     "jsxFactory": "tsxlight.createElement",
     "incremental": true,
-    "target": "es2016",
+    "target": "es2017",
     "module": "commonjs",
     "allowJs": true,
     "checkJs": false,
