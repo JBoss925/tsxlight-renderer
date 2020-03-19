@@ -8,6 +8,9 @@ import { InternalEventManager } from '../managers/internalEventManager';
 import { refreshWindow, Component, BaseAppComponent } from '../tsxlight';
 import { TSXSettings, RenderMode } from '../managers/settingsManager';
 import { JSXGenElType } from '../types/types';
+import { CallbackManager } from '../managers/callbackManager';
+import { ServerManager } from '../managers/serverManager';
+import { userIDToSocket, socketFromUserID } from '../server/serverHandler';
 let fs = require('fs');
 
 type renderable = Component<any, any> | JSX.Element;
@@ -27,7 +30,7 @@ export class tsxlightinstance {
   public testLog() {
     console.log("TEST LOG HERE BOU");
   }
-  public initString = TSXSettings.getRenderMode() == RenderMode.ELECTRON ? fs.readFileSync('template/templateInitElectron.html').toString() as string : fs.readFileSync('template/templateInitExpress.html').toString() as string;
+  public initString = TSXSettings.getRenderMode() == RenderMode.ELECTRON ? fs.readFileSync('template/templateTempElectron.html').toString() as string : fs.readFileSync('template/templateInitExpress.html').toString() as string;
   public currentDom: JSDOM = new JSDOM(this.initString);
   public currentRoot: HTMLElement | null = null;
   public baseApp: BaseAppComponent | undefined;
@@ -146,12 +149,15 @@ export class tsxlightinstance {
     this.renderToElectron(this.baseApp?.userApp as Component<any, any>);
   }
   public renderToElectron(comp: Component<any, any>) {
-    let body = this.renderComponentToDOMString([comp]);
-    let x = "<!-- #####TSXLIGHTIDHOOKHERE -->";
-    let replaceInd = (this.initString as string).indexOf(x);
-    let upToReplaced = (this.initString as string).substr(0, replaceInd);
-    fs.writeFileSync(this.getHTMLFilePath(), upToReplaced + "\n<body id=\"tsxlight-body\">" + this.renderComponentToDOMString([comp]) + "\n</body>");
-    refreshWindow();
+    console.log("ELECTRON RENDER!");
+    let domStr = "\n<meta id=\"tsxlight-settings\" name=\"tsxlight-settings\" content=\"" + TSXSettings.settingsStr + "\"></meta>" + this.renderComponentToDOMString([comp]) + "\n";
+    try {
+      let conn = socketFromUserID(UserManager.getUserIDForRendererID(this.instanceID));
+      conn.send(domStr);
+    } catch (err) {
+      console.log("Electron user not connected yet!");
+    }
+    // refreshWindow();
   }
   public render() {
     this.preRender();
@@ -165,7 +171,7 @@ export class tsxlightinstance {
   };
   otherIDInd = 0;
   otherIDPref = "tsxlight-"
-  public compOrJSXToString(renderableIn: (string | number | JSX.Element | JSX.ElementClass | Component<any, any> | JSXGenElType[] | JSXGenElType[] | Component<any, any> | JSX.Element[])[], depth?: number): string | number | undefined {
+  public compOrJSXToString(renderableIn: (string | number | JSX.Element | JSX.ElementClass | Component<any, any> | JSXGenElType[] | JSXGenElType[] | Component<any, any> | JSX.Element[])[], depth?: number, lastComp?: Component<any, any> | undefined): string | number | undefined {
     if (renderableIn.length <= 0) {
       return "Error! No renderables provided to tsxlight!";
     }
@@ -174,7 +180,7 @@ export class tsxlightinstance {
     }
     let tabStr = "";
     for (let i = 0; i < depth; i++) {
-      tabStr += "  ";
+      tabStr += "\t";
     }
     let renderedStr = "";
     for (let i = 0; i < renderableIn.length; i++) {
@@ -188,7 +194,7 @@ export class tsxlightinstance {
         if (renderComp.renderedChildren.length <= 0) {
           renderedStr += "";
         } else {
-          renderedStr += this.compOrJSXToString(renderComp.renderedChildren, depth);
+          renderedStr += this.compOrJSXToString(renderComp.renderedChildren, depth, renderableIn[i] as Component<any, any>);
         }
       } else {
         // It's an element!
@@ -209,7 +215,18 @@ export class tsxlightinstance {
             let keyVals: [string, string | number][] = [];
             let objEntries = Object.entries(elmProps);
             for (let [key, value] of objEntries) {
-              if (key == "children") {
+              if (key.startsWith("on")) {
+                // We're a callback!
+                let f = value as Function;
+                let userIDStr = UserManager.getUserIDForRendererID(this.instanceID);
+                let n = ('\"callbackMessenger(event, \'' + element.key + '\', \'' + key + '\')\"');
+                let cbID = "/" + element.key + "/" + key;
+                CallbackManager.addCallback(userIDStr, cbID, f, lastComp);
+                console.log("SET CALLBACK");
+                console.log(userIDStr, cbID);
+                keyVals.push([key.toLowerCase(), n]);
+                continue;
+              } else if (key == "children") {
                 continue;
               } else if (key == "id") {
                 keyVals.push([key, value as string | number]);
@@ -269,7 +286,7 @@ export class tsxlightinstance {
           let elmChildren: (JSX.Element)[] = (element as any).props?.children;
           let elmChildrenStr = "";
           if (elmChildren != undefined && elmChildren.length > 0) {
-            elmChildrenStr += this.compOrJSXToString(elmChildren, depth + 1) as string;
+            elmChildrenStr += this.compOrJSXToString(elmChildren, depth + 1, lastComp) as string;
           }
           renderedStr += ("\n" + tabStr + `<${elementType}${propsString}>${elmChildrenStr}` + "\n" + tabStr + `</${elementType}>`);
         }
@@ -283,7 +300,7 @@ export class tsxlightinstance {
       return "Couldn't find base root of app in template!";
     }
     this.otherIDInd = 0;
-    this.currentRoot.innerHTML = this.compOrJSXToString(baseComponents, 2) as string;
+    this.currentRoot.innerHTML = this.compOrJSXToString(baseComponents, 3) as string;
     return `\n\t<${this.currentRoot.tagName.toLowerCase()} id="tsxlight-app">${this.currentRoot.innerHTML}\n\t</${this.currentRoot.tagName.toLowerCase()}>`;
   }
 }

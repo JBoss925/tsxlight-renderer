@@ -5,10 +5,14 @@
   "main": "./index.js",
   "scripts": {
     "start": "electron .",
+    "compile": "tsc --jsxFactory tsxlight.createElement --esModuleInterop --allowUmdGlobalAccess --jsx react",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "author": "",
   "license": "ISC",
@@ -16,14 +20,17 @@
     "@types/electron": "^1.6.10",
     "@types/express": "^4.17.3",
     "@types/jsdom": "^16.1.0",
+    "@types/node": "^13.9.2",
     "@types/socket.io": "^2.1.4",
     "@types/uuid": "^7.0.0",
+    "@types/websocket": "^1.0.0",
     "electron": "^8.1.1",
     "express": "^4.17.1",
     "jsdom": "^16.2.1",
     "socket.io": "^2.3.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.8.3",
-    "uuid": "^7.0.2"
+    "uuid": "^7.0.2",
+    "websocket": "^1.0.31"
   }
 }

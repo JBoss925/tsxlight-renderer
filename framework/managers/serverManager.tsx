@@ -1,27 +1,34 @@
 import { Request, Response } from 'express';
 import { tsxlight } from '../tsxlight';
 import { TSXSettings } from './settingsManager';
+import { Express } from 'express';
+import express from 'express';
+import socketio from 'socket.io';
+import { server } from 'websocket';
 
 export class ServerManager {
 
   static isInit = false;
-  static app: Express.Application;
+  static app: Express;
   static port: number;
-  static io: any;
+  static socketPort: number;
+  static wsServer: server;
 
   public static init() {
     if (!ServerManager.isInit) {
-      const express = require('express');
       const app = express();
-      const server = require('http').createServer(app);
+      const serverInst = require('http').createServer(app);
       const port = TSXSettings.getSettings().port || 3000;
-      const io = require('socket.io')(server);
-      ServerManager.io = io;
+      const socketPort = TSXSettings.getSettings().socketPort || 1234;
+      serverInst.listen(socketPort, () => console.log(`WS listening on port ${socketPort}!`));
+      app.listen(port, () => console.log(`App listening on port ${port}!`))
+      const wsServ = new server({
+        httpServer: serverInst
+      });
+      ServerManager.wsServer = wsServ;
       ServerManager.app = app;
       ServerManager.port = port;
-      io.on('connection', () => { /* … */ });
-      server.listen(TSXSettings.getSettings().socketPort || 8000);
-      app.listen(port, () => console.log(`App listening on port ${port}!`))
+      ServerManager.socketPort = socketPort;
       ServerManager.isInit = true;
 
     }

@@ -1,11 +1,12 @@
 import { inspect } from 'util';
 import { v4 as uuidv4 } from 'uuid';
 
-// 4 things in this file:
+// 5 things in this file:
 //   - Builds the electron window
 //   - The renderer manager
 //   - The Component<P,S> base class
 //   - BaseAppComponent
+//   - Start the server handler
 
 
 // Start file end!
@@ -14,14 +15,8 @@ import { TSXSettings, RenderMode } from './managers/settingsManager';
 import { ServerManager } from './managers/serverManager';
 ServerManager.init();
 
-// TSX HTML Window Setup START -------------------------------------------------
-
-import { BrowserWindow } from 'electron';
-import { StateManager, PageCallback } from './managers/stateManager';
-import { tsxlightinstance } from './renderer/tsxRenderer';
-import { UserManager } from './managers/userManager';
-import { PageManager } from './managers/pageManager';
-import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType } from './types/types';
+// Start the server handler
+require('./server/serverHandler');
 
 let electronApp: Electron.App | undefined = undefined;
 
@@ -32,10 +27,29 @@ if (TSXSettings.getRenderMode() == RenderMode.EXPRESS) {
   electronApp = app;
 }
 
+function writeTemplateHTML() {
+  let init = fs.readFileSync('template/templateInitElectron.html').toString();
+  let x = '<meta id="tsxlight-settings" name="tsxlight-settings" content="' + JSON.stringify(TSXSettings.getSettings()).replace(/\"/g, "\'") + '"></meta>'
+  let newTemp = init.replace('<meta id="tsxlight-settings" name="tsxlight-settings" content="">', x);
+  fs.writeFileSync('template/templateTempElectron.html', newTemp);
+}
+writeTemplateHTML();
+
+// TSX HTML Window Setup START -------------------------------------------------
+
+import { BrowserWindow } from 'electron';
+import { StateManager, PageCallback } from './managers/stateManager';
+import { tsxlightinstance } from './renderer/tsxRenderer';
+import { UserManager } from './managers/userManager';
+import { PageManager } from './managers/pageManager';
+import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType } from './types/types';
+
 export let window: BrowserWindow;
 let windowShowRes: Function;
 function createWindow() {
   TSXSettings.loadSettings();
+  let temp = fs.readFileSync('template/templateTempElectron.html');
+  fs.writeFileSync('template/users/template_electronUser.html', temp);
   // Create the browser window.     
   window = new BrowserWindow({
     width: TSXSettings.getSettings().electronSettings.windowWidth,
@@ -375,4 +389,4 @@ export class BaseAppComponent extends Component<any, any>{
 
 }
 
-// BaseAppComonent END --------==-----------------------------------------------
+// BaseAppComonent END ---------------------------------------------------------

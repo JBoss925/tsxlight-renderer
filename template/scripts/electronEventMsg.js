@@ -1,8 +1,49 @@
-let fs = require('fs');
+let loaded = false;
+let resFunc;
+let websocket;
 
-function onCallbackMessenger(event) {
-  let eventStr = JSON.stringify(event);
-  console.log(eventStr);
+let callbackExecutionChain = new Promise((res, rej) => {
+  resFunc = res;
+});
+
+window.addEventListener('load', function () {
+  if (!loaded) {
+    startUpWebSocket();
+    loaded = true;
+    resFunc();
+  }
+});
+
+function callbackMessenger(event, id, eventType) {
+  let package = {
+    targetID: id,
+    eventType: eventType
+  }
+  callbackExecutionChain.then(() => { websocket.send(JSON.stringify(package)) });
 }
 
-module.exports.callbackMessenger = onCallbackMessenger;
+function replaceBodyWithNewAppRender(htmlString) {
+  document.getElementById("tsxlight-container").innerHTML = htmlString;
+}
+
+function startUpWebSocket() {
+  let settingsDiv = document.getElementById('tsxlight-settings')
+  let settingsStr = settingsDiv.content.replace(/\'/g, '\"');
+  let settings = JSON.parse(settingsStr);
+  let url = "";
+  if (settings.mode == 0) {
+    url = "ws://127.0.0.1:1234/";
+  } else {
+    url = "ws://" + settings.baseURL + ":" + settings.socketPort + "/";
+  }
+  let ws = new WebSocket(url);
+  ws.onopen = function (event) {
+    console.log("Opened connection with " + url);
+  };
+  ws.addEventListener("message", (ev) => {
+    replaceBodyWithNewAppRender(ev.data);
+  })
+  ws.onclose = function (ws, closeEvent) {
+  };
+  websocket = ws;
+}

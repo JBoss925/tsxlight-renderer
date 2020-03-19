@@ -1,15 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-  <script>
-    let { callbackMessenger } = require("../scripts/electronEventMsg.js");
-    callbackMessenger("event");
-  </script>
+  <title>Juice App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../scripts/electronEventMsg.js" type="text/javascript"></script>
 </head>
 
+<!-- #####TSXLIGHTIDHOOKHERE -->
 
 <body id="tsxlight-body">
-	<div id="tsxlight-app">
-    <p id="tsxlight-0">
-      Here's page 2!
-    </p>
-	</div>
+  <meta id="tsxlight-settings" name="tsxlight-settings" content="{'buildMode':'dev','homepagePageID':'page1','baseURL':'127.0.0.1','mode':0,'electronSettings':{'windowWidth':720,'windowHeight':480},'expressSettings':{},'port':'3000','socketPort':'1234'}"></meta>
+  </meta>
+  <div id="tsxlight-container">
+    <div id="tsxlight-app" onclick="callbackMessenger(event)">
+    </div>
+  </div>
 </body>
+
+</html>

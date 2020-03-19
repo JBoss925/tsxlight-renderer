@@ -1,3 +1,5 @@
+import { TSXSettings, RenderMode } from "../framework/managers/settingsManager";
+
 import { tsxlight, Component } from '../framework/tsxlight';
 import { PageManager } from '../framework/managers/pageManager';
 import { StateManager } from '../framework/managers/stateManager';
@@ -66,8 +68,12 @@ class LightComponent3 extends Component<LightProps, LightState> {
     super(props, state, key);
   }
 
+  public toPageTwo() {
+    this.transitionToPage("page2");
+  }
+
   public render() {
-    return <div id="pushItTotheLimit"><LightComponent2 className="help123123" yeet="off245235">whateversdfasf!!</LightComponent2></div>
+    return <div id="pushItTotheLimit"><p style={{ fontSize: "24pt" }} onClick={this.toPageTwo}>Here to page 2!</p><LightComponent2 className="help123123" yeet="off245235">whateversdfasf!!</LightComponent2></div>
   }
 
 }
@@ -77,8 +83,12 @@ class LightComponent4 extends Component<LightProps, LightState> {
     super(props, state, key);
   }
 
+  public toPageOne() {
+    this.transitionToPage("page1");
+  }
+
   public render() {
-    return <p>Here's page 2!</p>
+    return <div><p>Here's page 2!</p><br /><p onClick={this.toPageOne}>CLICK HERE to go to page 1!</p></div>
   }
 
 }
@@ -89,29 +99,31 @@ tsxlight.registerPage("page1", y, (id: string, base: Component<any, any>) => { }
 
 tsxlight.registerPage("page2", <LightComponent4 className="44444" yeet="4444"></LightComponent4>, (id: string, base: Component<any, any>) => { }, (id: string, base: Component<any, any>) => { });
 
-tsxlight.transitionToPage("page1");
-
-setTimeout(() => {
-  tsxlight.transitionToPage("page2");
-}, 4000);
-
-setTimeout(() => {
+if (TSXSettings.getSettings().mode == RenderMode.ELECTRON) {
   tsxlight.transitionToPage("page1");
-}, 8000);
 
-setTimeout(() => {
-  x.setState({ count: 67 });
-}, 10000);
+  setTimeout(() => {
+    tsxlight.transitionToPage("page2");
+  }, 4000);
 
-setTimeout(() => {
-  tsxlight.transitionToPage("page2");
-}, 12000);
+  setTimeout(() => {
+    tsxlight.transitionToPage("page1");
+  }, 8000);
 
-setTimeout(() => {
-  tsxlight.transitionToPage("page1");
-}, 14000);
+  setTimeout(() => {
+    x.setState({ count: 67 });
+  }, 10000);
+
+  setTimeout(() => {
+    tsxlight.transitionToPage("page2");
+  }, 12000);
+
+  setTimeout(() => {
+    tsxlight.transitionToPage("page1");
+  }, 14000);
+}
 
 
-setTimeout(() => {
-  x.transitionToPage("page2");
-}, 18000);
+// setTimeout(() => {
+//   x.transitionToPage("page2");
+// }, 18000);

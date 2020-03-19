@@ -1,8 +1,14 @@
 import { tsxlightinstance } from "../renderer/tsxRenderer";
 import { app } from "electron";
 const { screen } = require('electron');
+import settingsJsonRaw from './../settings.json';
 
 export type RawSettings = {
+  // buildMode is either "dev", "desktopMac", "desktopWin", "desktopLin", "express"
+  "buildMode": string,
+  "homepagePageID": string,
+  // baseURL is the base url of the server, without any slashes or protocols (no 'http://'), a good ex: is "google.com"
+  "baseURL": string,
   // Mode is either "electron" or "express"
   // Electron will build it for native, 
   "mode": string,
@@ -30,6 +36,9 @@ export type ExpressSettings = {
 }
 
 export type Settings = {
+  buildMode: string,
+  homepagePageID: string,
+  baseURL: string,
   mode: RenderMode,
   port: number,
   socketPort: number,
@@ -41,6 +50,7 @@ export class TSXSettings {
 
   public static settings: Settings;
   public static settingsInit: boolean = false;
+  public static settingsStr: string = "";
   public static getSettings(): Settings {
     if (TSXSettings.settingsInit) {
       return TSXSettings.settings;
@@ -68,11 +78,14 @@ export class TSXSettings {
     }
     return modeVal;
   }
-  public static loadSafeSettings() {
+  public static loadSafeSettings(): Settings {
     let modeVal = TSXSettings.getRenderMode();
     let elecSettings = { windowWidth: 720, windowHeight: 480 } as ElectronSettings;
     let exprSettings = TSXSettings.loadExpressSettings();
     let retVal: Settings = {
+      buildMode: TSXSettings.rawSettings.buildMode,
+      homepagePageID: TSXSettings.rawSettings.homepagePageID,
+      baseURL: TSXSettings.rawSettings.baseURL,
       mode: modeVal,
       electronSettings: elecSettings,
       expressSettings: exprSettings,
@@ -80,6 +93,7 @@ export class TSXSettings {
       socketPort: TSXSettings.rawSettings.socketPort
     };
     TSXSettings.settings = retVal;
+    TSXSettings.settingsStr = JSON.stringify(TSXSettings.settings).replace(/\"/g, '\'');
     return retVal;
   }
   public static loadSettings(): Settings {
@@ -90,6 +104,9 @@ export class TSXSettings {
     }
     let exprSettings = TSXSettings.loadExpressSettings();
     let retVal: Settings = {
+      buildMode: TSXSettings.rawSettings.buildMode,
+      homepagePageID: TSXSettings.rawSettings.homepagePageID,
+      baseURL: TSXSettings.rawSettings.baseURL,
       mode: modeVal,
       electronSettings: elecSettings as ElectronSettings,
       expressSettings: exprSettings,
@@ -97,6 +114,7 @@ export class TSXSettings {
       socketPort: TSXSettings.rawSettings.socketPort
     };
     TSXSettings.settings = retVal;
+    TSXSettings.settingsStr = JSON.stringify(TSXSettings.settings).replace(/\"/g, '\'');
     return retVal;
   }
   public static loadElectronSettings(): ElectronSettings {

@@ -1,6 +1,7 @@
 import { tsxlight, Component } from "../tsxlight";
 import { StateManager } from "./stateManager";
 import { tsxlightinstance } from "../renderer/tsxRenderer";
+import { UserManager } from "./userManager";
 
 export type PageCallback = (pageID: string, baseComponent: Component<any, any>) => any;
 
@@ -87,7 +88,7 @@ export class PageManager {
     let tsxlightInstance = PageManager.getTsxForTsxID(tsxID);
     let oldPageID = PageManager.getCurrentPageIDForTsxID(tsxID);
     if (oldPageID != "NO PAGE ID") {
-      if (oldPageID == pageID) {
+      if (oldPageID == pageID && UserManager.getUserIDForRendererID(tsxID) == UserManager.getLastUserIDForRendererID(tsxID)) {
         tsxlightInstance.render();
         return;
       }

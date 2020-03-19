@@ -1,7 +1,10 @@
 {
-  "mode": "electron",
+  "buildMode": "dev",
+  "mode": "express",
   "port": "3000",
-  "socketPort": "4000",
+  "baseURL": "127.0.0.1",
+  "homepagePageID": "page1",
+  "socketPort": "1234",
   "electronSettings": {
     "windowWidth": "50%",
     "windowHeight": "50%"
