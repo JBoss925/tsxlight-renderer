@@ -12,6 +12,8 @@ export type RawSettings = {
   // Mode is either "electron" or "express"
   // Electron will build it for native, 
   "mode": string,
+  // Whether or not to prefer the process.env.PORT value
+  "preferProcessPort": boolean,
   "port": number,
   "socketPort": number,
   // For electron
@@ -44,6 +46,7 @@ export type Settings = {
   homepagePageID: string,
   baseURL: string,
   mode: RenderMode,
+  preferProcessPort: boolean,
   port: number,
   socketPort: number,
   electronSettings: ElectronSettings,
@@ -93,6 +96,7 @@ export class TSXSettings {
       mode: modeVal,
       electronSettings: elecSettings,
       expressSettings: exprSettings,
+      preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
       port: TSXSettings.rawSettings.port,
       socketPort: TSXSettings.rawSettings.socketPort
     };
@@ -114,6 +118,7 @@ export class TSXSettings {
       mode: modeVal,
       electronSettings: elecSettings as ElectronSettings,
       expressSettings: exprSettings,
+      preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
       port: TSXSettings.rawSettings.port,
       socketPort: TSXSettings.rawSettings.socketPort
     };

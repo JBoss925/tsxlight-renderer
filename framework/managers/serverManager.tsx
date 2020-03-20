@@ -18,7 +18,17 @@ export class ServerManager {
     if (!ServerManager.isInit) {
       const app = express();
       const serverInst = require('http').createServer(app);
-      const port = TSXSettings.getSettings().port || 3000;
+      let envProc: any;
+      if (TSXSettings.getSettings().preferProcessPort) {
+        envProc = process.env.PORT;
+      }
+      let portV;
+      if (envProc == undefined) {
+        portV = TSXSettings.getSettings().port || 8080;
+      } else {
+        portV = envProc;
+      }
+      const port = portV;
       const socketPort = TSXSettings.getSettings().socketPort || 1234;
       serverInst.listen(socketPort, () => console.log(`WS listening on port ${socketPort}!`));
       app.listen(port, () => console.log(`App listening on port ${port}!`))
