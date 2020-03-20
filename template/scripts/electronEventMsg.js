@@ -41,7 +41,7 @@ function startUpWebSocket() {
   if (settings.mode == 0) {
     url = (protocol + "://127.0.0.1:3000/");
   } else {
-    url = (protocol + "://" + settings.baseURL + ":" + (settings.processPort ? settings.processPort : settings.port) + "/");
+    url = (protocol + "://" + settings.baseURL + (!settings.includePortInClientSocketUrl ? "" : (":" + (settings.processPort ? settings.processPort : settings.port))) + "/");
   }
   let ws = new WebSocket(url);
   ws.onopen = function (event) {
