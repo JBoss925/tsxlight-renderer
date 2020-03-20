@@ -4,7 +4,7 @@
   "description": "A lightweight tsx renderer without the ",
   "main": "./index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "npm i && electron .",
     "compile": "tsc --jsxFactory tsxlight.createElement --esModuleInterop --allowUmdGlobalAccess --jsx react",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
