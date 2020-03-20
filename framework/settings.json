@@ -9,5 +9,7 @@
     "windowWidth": "50%",
     "windowHeight": "50%"
   },
-  "expressSettings": {}
+  "expressSettings": {
+    "limit1Connection": false
+  }
 }

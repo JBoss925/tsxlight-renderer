@@ -19,10 +19,10 @@ let x: LightComponent;
 
 let z = 10;
 
-setTimeout(() => {
-  z = 1240;
-  x.forceUpdate();
-}, 17000);
+// setTimeout(() => {
+//   z = 1240;
+//   x.forceUpdate();
+// }, 17000);
 
 class LightComponent extends Component<LightProps, LightState>{
 
@@ -99,29 +99,29 @@ tsxlight.registerPage("page1", y, (id: string, base: Component<any, any>) => { }
 
 tsxlight.registerPage("page2", <LightComponent4 className="44444" yeet="4444"></LightComponent4>, (id: string, base: Component<any, any>) => { }, (id: string, base: Component<any, any>) => { });
 
-if (TSXSettings.getSettings().mode == RenderMode.ELECTRON) {
-  tsxlight.transitionToPage("page1");
+// if (TSXSettings.getSettings().mode == RenderMode.ELECTRON) {
+//   tsxlight.transitionToPage("page1");
 
-  setTimeout(() => {
-    tsxlight.transitionToPage("page2");
-  }, 4000);
+//   setTimeout(() => {
+//     tsxlight.transitionToPage("page2");
+//   }, 4000);
 
-  setTimeout(() => {
-    tsxlight.transitionToPage("page1");
-  }, 8000);
+//   setTimeout(() => {
+//     tsxlight.transitionToPage("page1");
+//   }, 8000);
 
-  setTimeout(() => {
-    x.setState({ count: 67 });
-  }, 10000);
+//   setTimeout(() => {
+//     x.setState({ count: 67 });
+//   }, 10000);
 
-  setTimeout(() => {
-    tsxlight.transitionToPage("page2");
-  }, 12000);
+//   setTimeout(() => {
+//     tsxlight.transitionToPage("page2");
+//   }, 12000);
 
-  setTimeout(() => {
-    tsxlight.transitionToPage("page1");
-  }, 14000);
-}
+//   setTimeout(() => {
+//     tsxlight.transitionToPage("page1");
+//   }, 14000);
+// }
 
 
 // setTimeout(() => {

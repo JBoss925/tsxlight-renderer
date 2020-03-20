@@ -20,7 +20,10 @@ export type RawSettings = {
     "windowWidth": string,
     "windowHeight": string
   },
-  "expressSettings": any
+  "expressSettings": {
+    // limit1Connection determines whether to inactivate old tabs when a new tab is opened on the site.
+    "limit1Connection": boolean
+  }
 }
 
 export enum RenderMode {
@@ -33,6 +36,7 @@ export type ElectronSettings = {
 }
 
 export type ExpressSettings = {
+  limit1Connection: boolean
 }
 
 export type Settings = {
@@ -145,7 +149,9 @@ export class TSXSettings {
     return elecSetRet;
   }
   public static loadExpressSettings(): ExpressSettings {
-    return {};
+    return {
+      limit1Connection: TSXSettings.rawSettings.expressSettings.limit1Connection
+    };
   }
 
 }

@@ -38,14 +38,41 @@ export class PageManager {
     this.tsxIDToCurrentPageID.set(tsxID, currPageID);
   }
   public static idToPage: Map<string, Page> = new Map<string, Page>();
-  public static idToBaseComponent: Map<string, Component<any, any>> = new Map<string, Component<any, any>>();
+  public static pageIdToBaseComponent: Map<string, Component<any, any>> = new Map<string, Component<any, any>>();
+  public static pageIdToTsxIDToComponent: Map<string, Map<number, Component<any, any>>> = new Map<string, Map<number, Component<any, any>>>();
   public static addPage(pageID: string, baseComponent: Component<any, any>, onLoadPage: PageCallback, onUnloadPage: PageCallback) {
-    PageManager.idToBaseComponent.set(pageID, baseComponent);
+    PageManager.pageIdToBaseComponent.set(pageID, baseComponent);
     PageManager.idToPage.set(pageID, {
       pageID: pageID,
       onLoadCallback: onLoadPage,
       onUnloadCallback: onUnloadPage
     } as Page);
+  }
+  public static getBaseComponentForTsxID(pageID: string, tsxID: number): Component<any, any> {
+    let x = PageManager.pageIdToTsxIDToComponent.get(pageID)?.get(tsxID);
+    if (x == undefined) {
+      let pageID = PageManager.getCurrentPageIDForTsxID(tsxID);
+      let baseComp = PageManager.pageIdToBaseComponent.get(pageID) as Component<any, any>;
+      let newComp = (new (baseComp.constructor as any)(baseComp.props, baseComp.state, baseComp.key));
+      return PageManager.setBaseComponentForTsxID(pageID, tsxID, newComp);
+    }
+    return x as Component<any, any>;
+  }
+  public static setBaseComponentForTsxID(pageID: string, tsxID: number, baseComponent: Component<any, any>): Component<any, any> {
+    let tsxToComp = PageManager.pageIdToTsxIDToComponent.get(pageID);
+    if (tsxToComp == undefined) {
+      let tsxToBase = new Map<number, Component<any, any>>();
+      tsxToBase.set(tsxID, baseComponent);
+      PageManager.pageIdToTsxIDToComponent.set(pageID, tsxToBase);
+      return baseComponent;
+    }
+    let tsxComp = tsxToComp.get(tsxID);
+    if (tsxComp == undefined) {
+      tsxToComp.set(tsxID, baseComponent);
+      return baseComponent;
+    }
+    tsxToComp.set(tsxID, baseComponent);
+    return baseComponent;
   }
   public static removePage(pageID: string) {
     PageManager.idToPage.delete(pageID);
@@ -96,15 +123,16 @@ export class PageManager {
       if (oldPage == undefined) {
         throw new Error("No page registered with id: " + pageID + "!");
       }
-      let oldBaseComp = tsxlight.getInstanceFromTSX(tsxID).baseApp?.userApp;
+      // Changed this!
+      let oldBaseComp = PageManager.getCurrentBaseComponent(tsxID);
       if (oldBaseComp == undefined) {
         throw new Error("Unable to find base component for id: " + oldPageID);
       }
       PageManager.saveStates(oldBaseComp);
-      PageManager.idToBaseComponent.delete(oldPageID);
+
       PageManager.idToPage.delete(oldPageID);
       PageManager.idToPage.set(oldPageID, oldPage);
-      PageManager.idToBaseComponent.set(oldPageID, oldBaseComp)
+      PageManager.setBaseComponentForTsxID(oldPageID, tsxID, oldBaseComp);
       oldPage.onUnloadCallback(oldPageID, oldBaseComp);
     }
     PageManager.setCurrentPageIDForTsxID(tsxlightInstance.instanceID, pageID);
@@ -112,23 +140,31 @@ export class PageManager {
     if (page == undefined) {
       throw new Error("No page registered with id: " + pageID + "!");
     }
-    let base = PageManager.idToBaseComponent.get(pageID);
+    let base = PageManager.getBaseComponentForTsxID(pageID, tsxID);
     if (base == undefined) {
       throw new Error("No base component registered with id: " + pageID + "!");
     }
-    PageManager.idToBaseComponent.delete(pageID);
     PageManager.idToPage.delete(pageID);
     PageManager.idToPage.set(pageID, page);
-    PageManager.idToBaseComponent.set(pageID, base);
+    PageManager.setBaseComponentForTsxID(pageID, tsxID, base);
     tsxlightInstance.render();
     page.onLoadCallback(pageID, base);
   }
   public static getCurrentBaseComponent(tsxID: number): Component<any, any> {
-    let curr = PageManager.idToBaseComponent.get(PageManager.getCurrentPageIDForTsxID(tsxID));
+    let pageID = PageManager.getCurrentPageIDForTsxID(tsxID);
+    let curr = PageManager.getBaseComponentForTsxID(pageID, tsxID);
     if (curr == undefined) {
-      throw new Error("Unable to find current base component for renderer with id: " + tsxID);
+      throw new Error("Unable to find current base component for page with id: " + pageID);
     }
-    return curr;
+    let currCompMap = PageManager.pageIdToTsxIDToComponent.get(pageID);
+    if (currCompMap == undefined) {
+      throw new Error("Unable to find current components for page with id: " + pageID);
+    }
+    let currComp = currCompMap.get(tsxID);
+    if (currComp == undefined) {
+      throw new Error("Unable to find current component for renderer with id: " + tsxID);
+    }
+    return currComp as Component<any, any>;
   }
   public static rerenderCurrentPage(tsxID: number) {
     PageManager.transitionToPage(tsxID, PageManager.getCurrentPageIDForTsxID(tsxID));

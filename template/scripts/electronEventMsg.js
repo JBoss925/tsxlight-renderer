@@ -14,16 +14,22 @@ window.addEventListener('load', function () {
   }
 });
 
+let hasReturned = true;
+
 function callbackMessenger(event, id, eventType) {
   let package = {
     targetID: id,
     eventType: eventType
   }
-  callbackExecutionChain.then(() => { websocket.send(JSON.stringify(package)) });
+  if (hasReturned) {
+    callbackExecutionChain.then(() => { websocket.send(JSON.stringify(package)) });
+    hasReturned = false;
+  }
 }
 
 function replaceBodyWithNewAppRender(htmlString) {
   document.getElementById("tsxlight-container").innerHTML = htmlString;
+  hasReturned = true;
 }
 
 function startUpWebSocket() {

@@ -113,8 +113,10 @@ class TsxlightRenderManager {
     PageManager.removePage(pageID);
   }
   public rerender(userID: string) {
+    console.log("RERENDER: ", userID);
     if (this.userIDtoRenderer.has(userID)) {
       let rend = this.userIDtoRenderer.get(userID) as tsxlightinstance;
+      console.log(rend);
       rend.rerender();
     } else {
       UserManager.setUserIDForRenderer(this.i, userID);
@@ -167,11 +169,12 @@ export abstract class Component<P, S> implements JSX.ElementClass {
     return this.currentPath.split("/")[1];
   }
   public transitionToPage(pageID: string) {
+    console.log("CURRPATHID: ", this.getUserIDFromCurrentPath())
     tsxlight.transitionToPage(pageID, this.getUserIDFromCurrentPath());
   }
   public renderChildren: (currPath?: string, tsx?: tsxlightinstance) => ((DOMTreeTypesDef) | JSXGenElType | JSXGenElType[])[] = (currPath?: string, tsx?: tsxlightinstance) => {
     if (currPath == undefined) {
-      let z = Array.from(PageManager.idToBaseComponent.values()).filter(x => x.type == this.type);
+      let z = Array.from(PageManager.pageIdToBaseComponent.values()).filter(x => x.type == this.type);
       currPath = '/' + UserManager.getUserIDForRendererID(tsx?.instanceID as number) + '/' + PageManager.getCurrentPageIDForTsxID(tsx?.instanceID as number) + '/[' + (z.length - 1) + ']' + this.type;
       this.currentPath = currPath;
     } else {

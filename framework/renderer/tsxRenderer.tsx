@@ -149,10 +149,11 @@ export class tsxlightinstance {
     this.renderToElectron(this.baseApp?.userApp as Component<any, any>);
   }
   public renderToElectron(comp: Component<any, any>) {
-    console.log("ELECTRON RENDER!");
     let domStr = "\n<meta id=\"tsxlight-settings\" name=\"tsxlight-settings\" content=\"" + TSXSettings.settingsStr + "\"></meta>" + this.renderComponentToDOMString([comp]) + "\n";
     try {
-      let conn = socketFromUserID(UserManager.getUserIDForRendererID(this.instanceID));
+      let userID = UserManager.getUserIDForRendererID(this.instanceID);
+      console.log("RENDEROUT!: ", userID);
+      let conn = socketFromUserID(userID);
       conn.send(domStr);
     } catch (err) {
       console.log("Electron user not connected yet!");
@@ -160,6 +161,10 @@ export class tsxlightinstance {
     // refreshWindow();
   }
   public render() {
+    console.log("INSTANCE ", this.instanceID);
+    if (this.instanceID == 1) {
+      console.log("INSTANCES", PageManager.getCurrentBaseComponent(0), PageManager.getCurrentBaseComponent(1))
+    }
     this.preRender();
     this.doRender();
   }
@@ -221,9 +226,7 @@ export class tsxlightinstance {
                 let userIDStr = UserManager.getUserIDForRendererID(this.instanceID);
                 let n = ('\"callbackMessenger(event, \'' + element.key + '\', \'' + key + '\')\"');
                 let cbID = "/" + element.key + "/" + key;
-                CallbackManager.addCallback(userIDStr, cbID, f, lastComp);
-                console.log("SET CALLBACK");
-                console.log(userIDStr, cbID);
+                CallbackManager.addCallback(userIDStr, PageManager.getCurrentPageIDForTsxID(this.instanceID), cbID, f, lastComp);
                 keyVals.push([key.toLowerCase(), n]);
                 continue;
               } else if (key == "children") {
