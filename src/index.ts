@@ -1,7 +1,7 @@
 // The entry point of the app!
 
 // Declare dummy namespace for heroku
-require('../framework/namespace/declareNamespace');
+// require('../framework/namespace/declareNamespace');
 
 function main() {
 
