@@ -29,7 +29,13 @@ export class ServerManager {
         portV = envProc;
       }
       const port = portV;
-      const socketPort = TSXSettings.getSettings().socketPort || 1234;
+      let portSockV;
+      if (envProc == undefined) {
+        portSockV = TSXSettings.getSettings().socketPort || 1234;
+      } else {
+        portSockV = envProc;
+      }
+      const socketPort = portSockV;
       serverInst.listen(socketPort, () => console.log(`WS listening on port ${socketPort}!`));
       app.listen(port, () => console.log(`App listening on port ${port}!`))
       const wsServ = new server({

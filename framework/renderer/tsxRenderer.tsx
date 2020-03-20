@@ -149,6 +149,10 @@ export class tsxlightinstance {
     this.renderToElectron(this.baseApp?.userApp as Component<any, any>);
   }
   public renderToElectron(comp: Component<any, any>) {
+    if ((TSXSettings.settings as any)['processPort'] == undefined) {
+      (TSXSettings.settings as any)['processPort'] = ServerManager.port;
+      TSXSettings.settingsStr = JSON.stringify(TSXSettings.settings);
+    }
     let domStr = "\n<meta id=\"tsxlight-settings\" name=\"tsxlight-settings\" content=\"" + TSXSettings.settingsStr + "\"></meta>" + this.renderComponentToDOMString([comp]) + "\n";
     try {
       let userID = UserManager.getUserIDForRendererID(this.instanceID);
