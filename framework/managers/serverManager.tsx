@@ -36,7 +36,7 @@ export class ServerManager {
         portSockV = envProc;
       }
       const socketPort = portSockV;
-      serverInst.listen(socketPort, () => console.log(`WS listening on port ${socketPort}!`));
+      // serverInst.listen(socketPort, () => console.log(`WS listening on port ${socketPort}!`));
       app.listen(port, () => console.log(`App listening on port ${port}!`))
       const wsServ = new server({
         httpServer: serverInst
