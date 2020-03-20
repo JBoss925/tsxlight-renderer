@@ -99,7 +99,7 @@ export class TSXSettings {
       expressSettings: exprSettings,
       useSecureSocket: TSXSettings.rawSettings.useSecureSocket,
       preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
-      port: TSXSettings.rawSettings.port
+      port: TSXSettings.rawSettings.preferProcessPort ? (process.env.PORT ? Number(process.env.PORT) : TSXSettings.rawSettings.port) : TSXSettings.rawSettings.port
     };
     TSXSettings.settings = retVal;
     TSXSettings.settingsStr = JSON.stringify(TSXSettings.settings).replace(/\"/g, '\'');
@@ -121,7 +121,7 @@ export class TSXSettings {
       expressSettings: exprSettings,
       useSecureSocket: TSXSettings.rawSettings.useSecureSocket,
       preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
-      port: TSXSettings.rawSettings.port
+      port: TSXSettings.rawSettings.preferProcessPort ? (process.env.PORT ? Number(process.env.PORT) : TSXSettings.rawSettings.port) : TSXSettings.rawSettings.port
     };
     TSXSettings.settings = retVal;
     TSXSettings.settingsStr = JSON.stringify(TSXSettings.settings).replace(/\"/g, '\'');
