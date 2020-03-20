@@ -32,7 +32,7 @@ class LightComponent extends Component<LightProps, LightState>{
   }
 
   public init() {
-    console.log("Init the state here with initState()!");
+    // console.log("Init the state here with initState()!");
     this.initState({ count: 9 });
   }
 

@@ -60,6 +60,7 @@ ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: ex
   electronDidConnect = true;
 
   if (TSXSettings.getSettings().expressSettings.limit1Connection) {
+    console.log("HERE!", req.ip);
     if (!userIDToSocket.has(req.ip)) {
       setupSocket(req.ip, ws);
     } else {
