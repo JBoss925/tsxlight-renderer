@@ -12,3 +12,9 @@ export type PropsType = {
 }
 
 // TSX Prop Requirements END ---------------------------------------------------
+
+declare namespace JSX {
+  interface Element { }
+  interface ElementClass { }
+  interface IntrinsicElements { div: any; }
+}
