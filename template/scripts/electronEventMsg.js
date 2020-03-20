@@ -41,7 +41,7 @@ function startUpWebSocket() {
   if (settings.mode == 0) {
     url = "ws://127.0.0.1:3000/";
   } else {
-    url = "wss://" + settings.baseURL + ":" + settings.port + "/";
+    url = "wss://" + settings.baseURL + "/";
   }
   let ws = new WebSocket(url);
   ws.onopen = function (event) {
