@@ -59,17 +59,20 @@ ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: ex
   }
   electronDidConnect = true;
 
+  if (req.connection.remoteAddress == undefined) {
+    throw new Error("Remote address for connection undefined!");
+  }
   if (TSXSettings.getSettings().expressSettings.limit1Connection) {
-    console.log("HERE!", req.ip);
-    if (!userIDToSocket.has(req.ip)) {
-      setupSocket(req.ip, ws);
+    console.log("HERE!", req.connection.remoteAddress);
+    if (!userIDToSocket.has(req.connection.remoteAddress)) {
+      setupSocket(req.connection.remoteAddress, ws);
     } else {
-      let conn = userIDToSocket.get(req.ip);
+      let conn = userIDToSocket.get(req.connection.remoteAddress);
       close(conn);
-      setupSocket(req.ip, ws);
+      setupSocket(req.connection.remoteAddress, ws);
     }
   } else {
-    setupSocket(req.ip, ws);
+    setupSocket(req.connection.remoteAddress, ws);
   }
 });
 
