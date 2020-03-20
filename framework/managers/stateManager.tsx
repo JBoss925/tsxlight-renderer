@@ -37,13 +37,9 @@ export class StateManager {
     }
     this.compToState.delete(path);
     this.compToState.set(path, state);
-    console.log("SET COMP STATE: " + path);
-    console.log(state);
   }
   public static getCompState(path: string) {
     let ret = this.compToState.get(path);
-    console.log("GET COMP STATE: " + path);
-    console.log(ret);
     return ret;
   }
 }

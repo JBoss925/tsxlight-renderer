@@ -53,13 +53,10 @@ ServerManager.app.get('/', (req: Request, res: Response) => {
 let electronDidConnect = false;
 
 ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: express.NextFunction) => {
-  console.log("REQUEST!");
   if (TSXSettings.getSettings().mode == RenderMode.ELECTRON && electronDidConnect) {
     req.destroy();
     return;
   }
-  console.log("oiopupuip");
-  // let connection = req.accept(undefined, request.origin);
   electronDidConnect = true;
 
   if (TSXSettings.getSettings().expressSettings.limit1Connection) {
@@ -77,7 +74,6 @@ ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: ex
 
 let setupRenderer = (socket: any) => {
   let id: string = (socket as any)['userID'];
-  console.log("SETUPRENDERER: ", id);
   if (UserManager.userIDToTsxID.has(id)) {
     tsxlight.transitionToPage(PageManager.getCurrentPageIDForTsxID(UserManager.getRendererIDForUserID(id)), id);
   } else {
@@ -128,16 +124,12 @@ function callbackMessenger(socket: any, cbPackage: Package) {
   callbackID += cbPackage.targetID;
   callbackID += "/";
   callbackID += cbPackage.eventType
-  console.log("CB MESSENGER");
-  console.log(usrID, callbackID);
   let currPageID = PageManager.getCurrentPageIDForTsxID(UserManager.getRendererIDForUserID(usrID));
   if (tsxlight.userIDtoRenderer.has(usrID)) {
-    console.log("1");
     CallbackManager.callCallback(usrID, currPageID, callbackID);
     CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
     tsxlight.rerender(usrID);
   } else {
-    console.log("2");
     CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
     tsxlight.rerender(usrID);
     CallbackManager.callCallback(usrID, currPageID, callbackID);

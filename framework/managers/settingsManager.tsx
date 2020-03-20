@@ -14,6 +14,8 @@ export type RawSettings = {
   "mode": string,
   // Whether or not to prefer the process.env.PORT value
   "preferProcessPort": boolean,
+  // If true, the frontend connects to socket via wss://, if false it's ws://
+  "useSecureSocket": boolean,
   "port": number,
   // For electron
   "electronSettings": {
@@ -45,6 +47,7 @@ export type Settings = {
   homepagePageID: string,
   baseURL: string,
   mode: RenderMode,
+  useSecureSocket: boolean,
   preferProcessPort: boolean,
   port: number,
   electronSettings: ElectronSettings,
@@ -94,6 +97,7 @@ export class TSXSettings {
       mode: modeVal,
       electronSettings: elecSettings,
       expressSettings: exprSettings,
+      useSecureSocket: TSXSettings.rawSettings.useSecureSocket,
       preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
       port: TSXSettings.rawSettings.port
     };
@@ -115,6 +119,7 @@ export class TSXSettings {
       mode: modeVal,
       electronSettings: elecSettings as ElectronSettings,
       expressSettings: exprSettings,
+      useSecureSocket: TSXSettings.rawSettings.useSecureSocket,
       preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
       port: TSXSettings.rawSettings.port
     };

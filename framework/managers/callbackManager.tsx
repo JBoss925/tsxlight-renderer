@@ -28,7 +28,6 @@ export class CallbackManager {
     }
   }
   public static addCallback(userID: string, pageID: string, callbackID: string, callback: Function, thisArg?: any) {
-    console.log("setcallback: " + userID + ", " + pageID + ", " + callbackID + ", " + callback + ", " + inspect(thisArg));
     if (this.userIDToPageToCallback.has(userID)) {
       let z = this.userIDToPageToCallback.get(userID) as Map<string, Map<string, Function>>;
       let m = this.userIDtoPageToThisArg.get(userID) as Map<string, Map<string, any>>;
@@ -72,7 +71,6 @@ export class CallbackManager {
       }
       let callback = cbIDtoCallback.get(callbackID) as Function;
       let thisArg = this.userIDtoPageToThisArg.get(userID)?.get(pageID)?.get(callbackID);
-      console.log("callCallback: " + userID + ", " + pageID + ", " + callbackID + ", " + callback + ", " + inspect(thisArg));
       callback.apply(thisArg);
     }
   }

@@ -19,7 +19,6 @@ export class tsxlightinstance {
   constructor(id: number) {
     this.instanceID = id;
     PageManager.setTsxForTsxID(this.instanceID, this);
-    InternalEventManager.registerForEvent("test", (event: any) => { console.log("ID HERE FOR TEST!!!"); console.log(event) });
   };
   private getHTMLFilePath() {
     return 'template/users/template_' + UserManager.getUserIDForRendererID(this.instanceID) + ".html"
@@ -156,7 +155,6 @@ export class tsxlightinstance {
     let domStr = "\n<meta id=\"tsxlight-settings\" name=\"tsxlight-settings\" content=\"" + TSXSettings.settingsStr + "\"></meta>" + this.renderComponentToDOMString([comp]) + "\n";
     try {
       let userID = UserManager.getUserIDForRendererID(this.instanceID);
-      console.log("RENDEROUT!: ", userID);
       let conn = socketFromUserID(userID);
       conn.send(domStr);
     } catch (err) {
@@ -165,10 +163,6 @@ export class tsxlightinstance {
     // refreshWindow();
   }
   public render() {
-    console.log("INSTANCE ", this.instanceID);
-    if (this.instanceID == 1) {
-      console.log("INSTANCES", PageManager.getCurrentBaseComponent(0), PageManager.getCurrentBaseComponent(1))
-    }
     this.preRender();
     this.doRender();
   }
