@@ -25,6 +25,7 @@ function callbackMessenger(event, id, eventType) {
     callbackExecutionChain.then(() => { websocket.send(JSON.stringify(package)) });
     hasReturned = false;
   }
+  console.log(package);
 }
 
 function replaceBodyWithNewAppRender(htmlString) {
@@ -38,16 +39,16 @@ function startUpWebSocket() {
   let settings = JSON.parse(settingsStr);
   let url = "";
   if (settings.mode == 0) {
-    url = "ws://127.0.0.1:1234/";
+    url = "ws://127.0.0.1:3000/";
   } else {
-    if (settings.prefer)
-      url = "wss://" + settings.baseURL + ":" + settings.socketPort + "/";
+    url = "ws://" + settings.baseURL + ":" + settings.port + "/";
   }
   let ws = new WebSocket(url);
   ws.onopen = function (event) {
     console.log("Opened connection with " + url);
   };
   ws.addEventListener("message", (ev) => {
+    console.log(ev.data);
     replaceBodyWithNewAppRender(ev.data);
   })
   ws.onclose = function (ws, closeEvent) {

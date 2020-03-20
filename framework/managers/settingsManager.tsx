@@ -15,7 +15,6 @@ export type RawSettings = {
   // Whether or not to prefer the process.env.PORT value
   "preferProcessPort": boolean,
   "port": number,
-  "socketPort": number,
   // For electron
   "electronSettings": {
     // Width and height must end in px or %
@@ -48,7 +47,6 @@ export type Settings = {
   mode: RenderMode,
   preferProcessPort: boolean,
   port: number,
-  socketPort: number,
   electronSettings: ElectronSettings,
   expressSettings: ExpressSettings
 }
@@ -97,8 +95,7 @@ export class TSXSettings {
       electronSettings: elecSettings,
       expressSettings: exprSettings,
       preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
-      port: TSXSettings.rawSettings.port,
-      socketPort: TSXSettings.rawSettings.socketPort
+      port: TSXSettings.rawSettings.port
     };
     TSXSettings.settings = retVal;
     TSXSettings.settingsStr = JSON.stringify(TSXSettings.settings).replace(/\"/g, '\'');
@@ -119,8 +116,7 @@ export class TSXSettings {
       electronSettings: elecSettings as ElectronSettings,
       expressSettings: exprSettings,
       preferProcessPort: TSXSettings.rawSettings.preferProcessPort,
-      port: TSXSettings.rawSettings.port,
-      socketPort: TSXSettings.rawSettings.socketPort
+      port: TSXSettings.rawSettings.port
     };
     TSXSettings.settings = retVal;
     TSXSettings.settingsStr = JSON.stringify(TSXSettings.settings).replace(/\"/g, '\'');

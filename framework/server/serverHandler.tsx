@@ -2,10 +2,13 @@ import { Request, Response } from 'express';
 import { ServerManager } from '../managers/serverManager';
 import { tsxlight } from '../tsxlight';
 import { CallbackManager } from '../managers/callbackManager';
-import { request, connection, IMessage } from 'websocket';
 import { TSXSettings, RenderMode } from '../managers/settingsManager';
 import { UserManager } from '../managers/userManager';
 import { PageManager } from '../managers/pageManager';
+import { WebsocketRequestHandler } from 'express-ws'
+import express from 'express';
+import expressws from 'express-ws';
+import core from 'express';
 let fs = require('fs');
 
 type Package = {
@@ -15,11 +18,11 @@ type Package = {
 
 let connIndex = 0;
 
-export let socketToUserID: Map<connection, string> = new Map();
+export let socketToUserID: Map<any, string> = new Map();
 export let connectedRemoteAddresses = new Set<string>();
-export let userIDToSocket: Map<string, connection> = new Map();
+export let userIDToSocket: Map<string, any> = new Map();
 
-export let userIDFromSocket = (socket: connection) => {
+export let userIDFromSocket = (socket: any) => {
   if (!socketToUserID.has(socket)) {
     throw new Error("Cannot get userID from socket!")
   }
@@ -30,7 +33,7 @@ export let socketFromUserID = (userID: string) => {
   if (!userIDToSocket.has(userID)) {
     throw new Error("Cannot get socker from userID: " + userID + "!")
   }
-  return userIDToSocket.get(userID) as connection;
+  return userIDToSocket.get(userID);
 };
 
 let script = fs.readFileSync('template/scripts/electronEventMsg.js');
@@ -49,32 +52,30 @@ ServerManager.app.get('/', (req: Request, res: Response) => {
 
 let electronDidConnect = false;
 
-ServerManager.wsServer.on("request", function (request: request) {
+ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: express.NextFunction) => {
   console.log("REQUEST!");
   if (TSXSettings.getSettings().mode == RenderMode.ELECTRON && electronDidConnect) {
-    request.reject();
+    req.destroy();
     return;
   }
-  let connection = request.accept(undefined, request.origin);
+  console.log("oiopupuip");
+  // let connection = req.accept(undefined, request.origin);
   electronDidConnect = true;
-});
 
-ServerManager.wsServer.on("connect", function (connection: connection) {
-  console.log("CONNECTION!");
   if (TSXSettings.getSettings().expressSettings.limit1Connection) {
-    if (!userIDToSocket.has(connection.remoteAddress)) {
-      setupSocket(connection);
+    if (!userIDToSocket.has(req.ip)) {
+      setupSocket(req.ip, ws);
     } else {
-      let conn = userIDToSocket.get(connection.remoteAddress) as connection;
+      let conn = userIDToSocket.get(req.ip);
       close(conn);
-      setupSocket(connection);
+      setupSocket(req.ip, ws);
     }
   } else {
-    setupSocket(connection);
+    setupSocket(req.ip, ws);
   }
 });
 
-let setupRenderer = (socket: connection) => {
+let setupRenderer = (socket: any) => {
   let id: string = (socket as any)['userID'];
   console.log("SETUPRENDERER: ", id);
   if (UserManager.userIDToTsxID.has(id)) {
@@ -84,15 +85,15 @@ let setupRenderer = (socket: connection) => {
   }
 }
 
-let setupSocket = (socket: connection) => {
+let setupSocket = (ip: string, socket: any) => {
   let id: string;
   if (TSXSettings.getSettings().mode == RenderMode.ELECTRON) {
     id = UserManager.getElectronUserID();
   } else {
     if (TSXSettings.getSettings().expressSettings.limit1Connection) {
-      id = socket.remoteAddress;
+      id = ip;
     } else {
-      id = (socket.remoteAddress + connIndex);
+      id = (ip + connIndex);
       connIndex++;
     }
   }
@@ -100,17 +101,16 @@ let setupSocket = (socket: connection) => {
   socketToUserID.set(socket, id);
   userIDToSocket.set(id, socket);
   setupRenderer(socket);
-  socket.on('message', (data: IMessage) => {
-    console.log(data.utf8Data);
-    if (data.utf8Data != undefined) {
-      let pack = JSON.parse(data.utf8Data as string);
+  socket.on('message', (data: any) => {
+    if (data != undefined) {
+      let pack = JSON.parse(data as string);
       callbackMessenger(socket, pack);
     }
-  })
+  });
   socket.on('close', () => { });
 };
 
-function close(socket: connection) {
+function close(socket: any) {
   socket.send("<div style=\"display:flex;justify-content:center;align-content:center;\"><p style=\"font-size:24pt;padding-top:2em;font-weight:800;font-family:Arial;\">Connected on another tab. Refresh to reset the current tab as the app tab.</p></div>");
   socket.close();
   let x = socketToUserID.get(socket);
@@ -121,7 +121,7 @@ function close(socket: connection) {
   userIDToSocket.delete(x);
 }
 
-function callbackMessenger(socket: connection, cbPackage: Package) {
+function callbackMessenger(socket: any, cbPackage: Package) {
   let usrID = (socket as any)['userID'] as string;
   let callbackID: string = "";
   callbackID += "/";
