@@ -58,21 +58,21 @@ ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: ex
     return;
   }
   electronDidConnect = true;
-
-  if (req.connection.remoteAddress == undefined) {
+  let addr = (req.headers['x-forwarded-for'] || req.connection.remoteAddress) as string;
+  if (addr == undefined) {
     throw new Error("Remote address for connection undefined!");
   }
   if (TSXSettings.getSettings().expressSettings.limit1Connection) {
-    console.log("HERE!", req.connection.remoteAddress);
-    if (!userIDToSocket.has(req.connection.remoteAddress)) {
-      setupSocket(req.connection.remoteAddress, ws);
+    console.log("HERE!", addr);
+    if (!userIDToSocket.has(addr)) {
+      setupSocket(addr, ws);
     } else {
-      let conn = userIDToSocket.get(req.connection.remoteAddress);
+      let conn = userIDToSocket.get(addr);
       close(conn);
-      setupSocket(req.connection.remoteAddress, ws);
+      setupSocket(addr, ws);
     }
   } else {
-    setupSocket(req.connection.remoteAddress, ws);
+    setupSocket(addr, ws);
   }
 });
 
