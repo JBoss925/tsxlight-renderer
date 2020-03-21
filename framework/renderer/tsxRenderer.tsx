@@ -26,9 +26,6 @@ export class tsxlightinstance {
   private writeTemplateToHTMLFile() {
     fs.writeFileSync(this.getHTMLFilePath(), this.initString);
   }
-  public testLog() {
-    console.log("TEST LOG HERE BOU");
-  }
   public initString = TSXSettings.getRenderMode() == RenderMode.ELECTRON ? fs.readFileSync('template/templateTempElectron.html').toString() as string : fs.readFileSync('template/templateInitExpress.html').toString() as string;
   public currentDom: JSDOM = new JSDOM(this.initString);
   public currentRoot: HTMLElement | null = null;
@@ -136,20 +133,15 @@ export class tsxlightinstance {
       throw new Error("Attempted to render with normal JSX.Element as root! It must be a component!")
     }
     if (this.baseApp == undefined) {
-      console.log("GOT HERE!");
       this.baseApp = new BaseAppComponent(currentComp, this, {}, {});
     } else {
-      console.log("GOT HERE2!");
       this.baseApp.setChild(currentComp);
     }
   }
   public doRender() {
     this.clearRenderedChildren(this.baseApp as Component<any, any>);
-    console.log("GOT HERE 3");
     this.baseApp?.renderApp();
-    console.log("GOT HERE 4");
     this.renderToElectron(this.baseApp?.userApp as Component<any, any>);
-    console.log("GOT HERE 5");
   }
   public renderToElectron(comp: Component<any, any>) {
     if ((TSXSettings.settings as any)['processPort'] == undefined) {

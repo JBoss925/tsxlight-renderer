@@ -53,20 +53,16 @@ ServerManager.app.get('/', (req: Request, res: Response) => {
 let electronDidConnect = false;
 
 ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: express.NextFunction) => {
-  console.log("1");
   if (TSXSettings.getSettings().mode == RenderMode.ELECTRON && electronDidConnect) {
-    console.log("2");
     req.destroy();
     return;
   }
-  console.log("3");
   electronDidConnect = true;
   let addr = (req.headers['x-forwarded-for'] || req.connection.remoteAddress) as string;
   if (addr == undefined) {
     throw new Error("Remote address for connection undefined!");
   }
   if (TSXSettings.getSettings().expressSettings.limit1Connection) {
-    console.log("HERE!", addr);
     if (!userIDToSocket.has(addr)) {
       setupSocket(addr, ws);
     } else {
@@ -75,7 +71,6 @@ ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: ex
       setupSocket(addr, ws);
     }
   } else {
-    console.log("HERE2!", addr);
     setupSocket(addr, ws);
   }
 });
@@ -83,12 +78,8 @@ ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: ex
 let setupRenderer = (socket: any) => {
   let id: string = (socket as any)['userID'];
   if (UserManager.userIDToTsxID.has(id)) {
-    console.log(1);
-    console.log(id);
     tsxlight.transitionToPage(PageManager.getCurrentPageIDForTsxID(UserManager.getRendererIDForUserID(id)), id);
   } else {
-    console.log(2);
-    console.log(id);
     tsxlight.transitionToPage(TSXSettings.getSettings().homepagePageID, id);
   }
 }

@@ -59,8 +59,6 @@ class LightComponent2 extends Component<LightProps, LightState> {
   public render() {
     let x = this.props.children ? this.props.children as any[] : [];
     x.push(<LightComponent className="help" yeet="off">some type of text!!</LightComponent>);
-    console.log("RENDER");
-    console.log(x);
     return <div id="someotherthing" children={x}></div>
   }
 
