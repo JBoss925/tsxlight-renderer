@@ -92,7 +92,7 @@ let setupSocket = (ip: string, socket: any) => {
     if (TSXSettings.getSettings().expressSettings.limit1Connection) {
       id = ip;
     } else {
-      id = (ip + connIndex);
+      id = (ip + "|||" + connIndex);
       connIndex++;
     }
   }
@@ -106,18 +106,22 @@ let setupSocket = (ip: string, socket: any) => {
       callbackMessenger(socket, pack);
     }
   });
-  socket.on('close', () => { });
+  socket.on('close', () => {
+    close(socket);
+  });
 };
 
 function close(socket: any) {
-  socket.send("<div style=\"display:flex;justify-content:center;align-content:center;\"><p style=\"font-size:24pt;padding-top:2em;font-weight:800;font-family:Arial;\">Connected on another tab. Refresh to reset the current tab as the app tab.</p></div>");
-  socket.close();
-  let x = socketToUserID.get(socket);
-  if (x == undefined) {
-    throw new Error("Socket disconnected that wasn't registered! With client id: " + (socket as any)['userID']);
+  if (!(socket.readyState == 2 || socket.readyState == 3)) {
+    socket.send("<div style=\"display:flex;justify-content:center;align-content:center;\"><p style=\"font-size:24pt;padding-top:2em;font-weight:800;font-family:Arial;\">Connected on another tab. Refresh to reset the current tab as the app tab.</p></div>");
+    socket.close();
+    let x = socketToUserID.get(socket);
+    if (x == undefined) {
+      throw new Error("Socket disconnected that wasn't registered! With client id: " + (socket as any)['userID']);
+    }
+    socketToUserID.delete(socket);
+    userIDToSocket.delete(x);
   }
-  socketToUserID.delete(socket);
-  userIDToSocket.delete(x);
 }
 
 function callbackMessenger(socket: any, cbPackage: Package) {

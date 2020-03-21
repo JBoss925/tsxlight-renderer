@@ -14,6 +14,10 @@ window.addEventListener('load', function () {
   }
 });
 
+window.addEventListener('close', function () {
+  ws.close();
+});
+
 let hasReturned = true;
 
 function callbackMessenger(event, id, eventType) {
