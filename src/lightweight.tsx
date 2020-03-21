@@ -41,6 +41,7 @@ class LightComponent extends Component<LightProps, LightState>{
   }
 
   public log() {
+    console.log(this.getScreenSize());
     console.log("Log callback!")
   }
 

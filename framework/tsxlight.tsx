@@ -18,13 +18,11 @@ ServerManager.init();
 // Start the server handler
 require('./server/serverHandler');
 
-let electronApp: Electron.App | undefined = undefined;
-
 if (TSXSettings.getRenderMode() == RenderMode.EXPRESS) {
   TSXSettings.loadSettings();
 } else if (TSXSettings.getRenderMode() == RenderMode.ELECTRON) {
   const { app } = require('electron');
-  electronApp = app;
+  app.on('ready', createWindow);
 }
 
 function writeTemplateHTML() {
@@ -43,11 +41,16 @@ import { tsxlightinstance } from './renderer/tsxRenderer';
 import { UserManager } from './managers/userManager';
 import { PageManager } from './managers/pageManager';
 import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType } from './types/types';
+import { ScreenSizeManager, ScreenSize } from './managers/screenSizeManager';
 
 export let window: BrowserWindow;
 let windowShowRes: Function;
 function createWindow() {
   TSXSettings.loadSettings();
+  ScreenSizeManager.setScreenSize(UserManager.getElectronUserID(), {
+    width: TSXSettings.getSettings().electronSettings.windowWidth,
+    height: TSXSettings.getSettings().electronSettings.windowHeight
+  });
   let temp = fs.readFileSync('template/templateTempElectron.html');
   fs.writeFileSync('template/users/template_electronUser.html', temp);
   // Create the browser window.     
@@ -70,10 +73,6 @@ export let refreshWindow = () => { windowShown = windowShown.then(() => window.r
 let windowShown: Promise<any> = new Promise<any>((res, rej) => {
   windowShowRes = res;
 });
-
-if (TSXSettings.getRenderMode() == RenderMode.ELECTRON) {
-  (() => { (electronApp as Electron.App).on('ready', createWindow); })();
-}
 
 // TSX HTML Window Setup END ---------------------------------------------------
 
@@ -171,11 +170,14 @@ export abstract class Component<P, S> implements JSX.ElementClass {
   public renderedChildren: ((DOMTreeTypesDef) | JSXGenElType | JSXGenElType[])[] = [];
   public key: string | number | null | undefined;
   abstract render(): (JSXGenElType | JSXGenElType[]);
-  private getUserIDFromCurrentPath(): string {
+  private getUserID(): string {
     return this.currentPath.split("/")[1];
   }
+  public getScreenSize(): ScreenSize {
+    return ScreenSizeManager.getScreenSize(this.getUserID());
+  }
   public transitionToPage(pageID: string) {
-    tsxlight.transitionToPage(pageID, this.getUserIDFromCurrentPath());
+    tsxlight.transitionToPage(pageID, this.getUserID());
   }
   public renderChildren: (currPath?: string, tsx?: tsxlightinstance) => ((DOMTreeTypesDef) | JSXGenElType | JSXGenElType[])[] = (currPath?: string, tsx?: tsxlightinstance) => {
     if (currPath == undefined) {
@@ -332,7 +334,7 @@ export abstract class Component<P, S> implements JSX.ElementClass {
     callback ? callback() : (() => { })();
   }
   private rerender() {
-    tsxlight.rerender(this.getUserIDFromCurrentPath());
+    tsxlight.rerender(this.getUserID());
   }
   setState<K extends never>(state: any, callback?: (() => void) | undefined): void {
     this.state = state;

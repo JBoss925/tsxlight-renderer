@@ -11,6 +11,7 @@ import { JSXGenElType } from '../types/types';
 import { CallbackManager } from '../managers/callbackManager';
 import { ServerManager } from '../managers/serverManager';
 import { userIDToSocket, socketFromUserID } from '../server/serverHandler';
+import { ScreenSize, ScreenSizeManager } from '../managers/screenSizeManager';
 let fs = require('fs');
 
 type renderable = Component<any, any> | JSX.Element;
@@ -25,6 +26,9 @@ export class tsxlightinstance {
   }
   private writeTemplateToHTMLFile() {
     fs.writeFileSync(this.getHTMLFilePath(), this.initString);
+  }
+  public getScreenSize(): ScreenSize {
+    return ScreenSizeManager.getScreenSize(UserManager.getUserIDForRendererID(this.instanceID));
   }
   public initString = TSXSettings.getRenderMode() == RenderMode.ELECTRON ? fs.readFileSync('template/templateTempElectron.html').toString() as string : fs.readFileSync('template/templateInitExpress.html').toString() as string;
   public currentDom: JSDOM = new JSDOM(this.initString);

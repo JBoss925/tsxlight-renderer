@@ -9,6 +9,7 @@ import { WebsocketRequestHandler } from 'express-ws'
 import express from 'express';
 import expressws from 'express-ws';
 import core from 'express';
+import { ScreenSizeManager } from '../managers/screenSizeManager';
 let fs = require('fs');
 
 type Package = {
@@ -64,27 +65,18 @@ ServerManager.wsServer.app.ws("/", (ws: any, req: express.Request<any>, next: ex
   }
   if (TSXSettings.getSettings().expressSettings.limit1Connection) {
     if (!userIDToSocket.has(addr)) {
-      setupSocket(addr, ws);
+      setupSocketCalls(addr, ws);
     } else {
       let conn = userIDToSocket.get(addr);
       close(conn);
-      setupSocket(addr, ws);
+      setupSocketCalls(addr, ws);
     }
   } else {
-    setupSocket(addr, ws);
+    setupSocketCalls(addr, ws);
   }
 });
 
-let setupRenderer = (socket: any) => {
-  let id: string = (socket as any)['userID'];
-  if (UserManager.userIDToTsxID.has(id)) {
-    tsxlight.transitionToPage(PageManager.getCurrentPageIDForTsxID(UserManager.getRendererIDForUserID(id)), id);
-  } else {
-    tsxlight.transitionToPage(TSXSettings.getSettings().homepagePageID, id);
-  }
-}
-
-let setupSocket = (ip: string, socket: any) => {
+let setupSocketCalls = (ip: string, socket: any) => {
   let id: string;
   if (TSXSettings.getSettings().mode == RenderMode.ELECTRON) {
     id = UserManager.getElectronUserID();
@@ -99,16 +91,41 @@ let setupSocket = (ip: string, socket: any) => {
   (socket as any)['userID'] = id;
   socketToUserID.set(socket, id);
   userIDToSocket.set(id, socket);
-  setupRenderer(socket);
   socket.on('message', (data: any) => {
     if (data != undefined) {
       let pack = JSON.parse(data as string);
-      callbackMessenger(socket, pack);
+      if (pack.type == "callback") {
+        callbackMessenger(socket, pack);
+      } else if (pack.type == "screenSize") {
+        setupScreenSize(id, pack);
+      } else if (pack.type == "setup") {
+        setupSocket(id, socket);
+      }
     }
   });
   socket.on('close', () => {
     close(socket);
   });
+}
+
+let setupScreenSize = (userID: string, pack: any) => {
+  ScreenSizeManager.setScreenSize(userID, {
+    width: pack.width,
+    height: pack.height
+  });
+}
+
+let setupRenderer = (socket: any) => {
+  let id: string = (socket as any)['userID'];
+  if (UserManager.userIDToTsxID.has(id)) {
+    tsxlight.transitionToPage(PageManager.getCurrentPageIDForTsxID(UserManager.getRendererIDForUserID(id)), id);
+  } else {
+    tsxlight.transitionToPage(TSXSettings.getSettings().homepagePageID, id);
+  }
+}
+
+let setupSocket = (ip: string, socket: any) => {
+  setupRenderer(socket);
 };
 
 function close(socket: any) {

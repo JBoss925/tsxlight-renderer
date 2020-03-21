@@ -18,10 +18,23 @@ window.addEventListener('close', function () {
   ws.close();
 });
 
+let windowSizeSampleRateMS = 100;
+let lastSample = 0;
+
+window.addEventListener("resize", (ev) => {
+  // Possible sample rate limiting code
+  // if (Date.now() - lastSample > windowSizeSampleRateMS) {
+  let screenInfo = { type: "screenSize", width: window.innerWidth, height: window.innerHeight };
+  websocket.send(JSON.stringify(screenInfo));
+  // lastSample = Date.now();
+  // }
+});
+
 let hasReturned = true;
 
 function callbackMessenger(event, id, eventType) {
   let package = {
+    type: "callback",
     targetID: id,
     eventType: eventType
   }
@@ -50,6 +63,10 @@ function startUpWebSocket() {
   let ws = new WebSocket(url);
   ws.onopen = function (event) {
     console.log("Opened connection with " + url);
+    let screenInfo = { type: "screenSize", width: window.innerWidth, height: window.innerHeight };
+    ws.send(JSON.stringify(screenInfo));
+    let setupPack = { type: "setup" };
+    ws.send(JSON.stringify(setupPack));
   };
   ws.addEventListener("message", (ev) => {
     replaceBodyWithNewAppRender(ev.data);

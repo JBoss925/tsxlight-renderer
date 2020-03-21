@@ -12,6 +12,6 @@
     "windowHeight": "50%"
   },
   "expressSettings": {
-    "limit1Connection": true
+    "limit1Connection": false
   }
 }
