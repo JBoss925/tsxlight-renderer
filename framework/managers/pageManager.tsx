@@ -115,7 +115,7 @@ export class PageManager {
     let tsxlightInstance = PageManager.getTsxForTsxID(tsxID);
     let oldPageID = PageManager.getCurrentPageIDForTsxID(tsxID);
     if (oldPageID != "NO PAGE ID") {
-      if (oldPageID == pageID && UserManager.getUserIDForRendererID(tsxID) == UserManager.getLastUserIDForRendererID(tsxID)) {
+      if (oldPageID == pageID && (UserManager.getLastUserIDForRendererID(tsxID) == undefined || (UserManager.getLastUserIDForRendererID(tsxID) != undefined && UserManager.getUserIDForRendererID(tsxID) == UserManager.getLastUserIDForRendererID(tsxID)))) {
         tsxlightInstance.render();
         return;
       }

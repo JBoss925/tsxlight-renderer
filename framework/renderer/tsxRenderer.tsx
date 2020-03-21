@@ -127,7 +127,6 @@ export class tsxlightinstance {
     }
   }
   public preRender() {
-
     if (!fs.existsSync(this.getHTMLFilePath())) {
       this.writeTemplateToHTMLFile();
     }
@@ -137,15 +136,20 @@ export class tsxlightinstance {
       throw new Error("Attempted to render with normal JSX.Element as root! It must be a component!")
     }
     if (this.baseApp == undefined) {
+      console.log("GOT HERE!");
       this.baseApp = new BaseAppComponent(currentComp, this, {}, {});
     } else {
+      console.log("GOT HERE2!");
       this.baseApp.setChild(currentComp);
     }
   }
   public doRender() {
     this.clearRenderedChildren(this.baseApp as Component<any, any>);
+    console.log("GOT HERE 3");
     this.baseApp?.renderApp();
+    console.log("GOT HERE 4");
     this.renderToElectron(this.baseApp?.userApp as Component<any, any>);
+    console.log("GOT HERE 5");
   }
   public renderToElectron(comp: Component<any, any>) {
     if ((TSXSettings.settings as any)['processPort'] == undefined) {

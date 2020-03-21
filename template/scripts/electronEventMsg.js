@@ -48,6 +48,8 @@ function startUpWebSocket() {
     console.log("Opened connection with " + url);
   };
   ws.addEventListener("message", (ev) => {
+    console.log("MESSAGE");
+    console.log(ev.data);
     replaceBodyWithNewAppRender(ev.data);
   })
   ws.onclose = function (ws, closeEvent) {

@@ -43,6 +43,7 @@ import { tsxlightinstance } from './renderer/tsxRenderer';
 import { UserManager } from './managers/userManager';
 import { PageManager } from './managers/pageManager';
 import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType } from './types/types';
+import { associateFuncsWithThisArgs } from './util/commonOps';
 
 export let window: BrowserWindow;
 let windowShowRes: Function;
@@ -137,13 +138,24 @@ class TsxlightRenderManager {
     }
     return this.getInstanceFromUser(this.tsxIDtoUserID.get(tsxID) as string);
   }
-  public createElement(tagType: any, props: any, ...value: string[] | number[] | undefined[] | null[]): JSX.Element {
-    let propsWithChildren = { ...props, children: value };
+  public createElement(tagType: any, props: any, ...value: any[]): JSX.Element {
+    console.log(tagType);
+    console.log(props);
+    console.log(value);
+    if (props == undefined || props == null) {
+      props = {};
+    }
+    if (props.children == undefined || props.children == null) {
+      props.children = props.children ? props.children : [];
+    }
+    if (!(value.length == 0 || value[0] == undefined || value[0] == null)) {
+      props.children.push(...value);
+    }
     if (typeof (tagType) == "string") {
-      let element = { type: tagType, props: propsWithChildren, key: propsWithChildren.id ? propsWithChildren.id : null } as JSX.Element;
+      let element = { type: tagType, props: props, key: props.id ? props.id : null } as JSX.Element;
       return element;
     } else {
-      let element = new tagType(propsWithChildren, {} as any, propsWithChildren.id ? propsWithChildren.id : null) as JSX.Element;
+      let element = new tagType(props, {} as any, props.id ? props.id : null) as JSX.Element;
       return element;
     }
   }
@@ -171,11 +183,9 @@ export abstract class Component<P, S> implements JSX.ElementClass {
   }
   public renderChildren: (currPath?: string, tsx?: tsxlightinstance) => ((DOMTreeTypesDef) | JSXGenElType | JSXGenElType[])[] = (currPath?: string, tsx?: tsxlightinstance) => {
     if (currPath == undefined) {
-      let z = Array.from(PageManager.pageIdToBaseComponent.values()).filter(x => x.type == this.type);
+      let z = Array.from((PageManager.pageIdToTsxIDToComponent.get(PageManager.getCurrentPageIDForTsxID(tsx?.instanceID as number)) as Map<number, Component<any, any>>).values()).filter(x => x.type == this.type);
       currPath = '/' + UserManager.getUserIDForRendererID(tsx?.instanceID as number) + '/' + PageManager.getCurrentPageIDForTsxID(tsx?.instanceID as number) + '/[' + (z.length - 1) + ']' + this.type;
       this.currentPath = currPath;
-    } else {
-      this.props.children = [];
     }
     this.renderedChildren = [];
     let rendVal = this.render();
@@ -184,7 +194,6 @@ export abstract class Component<P, S> implements JSX.ElementClass {
       // Do nothing!
       // We're an any type!
       this.renderedChildren.push(rendVal);
-      return this.renderedChildren;
     } else if (!(rendVal instanceof Component)) {
       // We're an element! So render children!
       let renderElChil = ((thisArg: any) => {
@@ -200,6 +209,7 @@ export abstract class Component<P, S> implements JSX.ElementClass {
           if (x instanceof Component) {
             x['renderedChildren'] = [];
             (x as Component<any, any>).currentPath = currPath + '/[' + n + ']' + (x as Component<any, any>).type;
+            associateFuncsWithThisArgs((x as any));
             (x as Component<any, any>).init();
             (thisArg as any)['renderedChildren'].push(...x.renderChildren(currPath));
           } else if (typeof (x) != "string" && typeof (x) != "number" && typeof (x) != "undefined") {
@@ -241,6 +251,7 @@ export abstract class Component<P, S> implements JSX.ElementClass {
     } else if (child instanceof Component) {
       // We're a component! So render children!
       (child as Component<any, any>).currentPath = currPath + '/[' + i + ']' + (child as Component<any, any>).type;
+      associateFuncsWithThisArgs((child as any));
       (child as Component<any, any>).init();
       this.renderedChildren.push(...(child as Component<any, any>).renderChildren((child as Component<any, any>).currentPath));
     } else {
@@ -261,6 +272,7 @@ export abstract class Component<P, S> implements JSX.ElementClass {
           if (x instanceof Component) {
             x['renderedChildren'] = [];
             (x as Component<any, any>).currentPath = currPath + '/[' + n + ']' + (x as Component<any, any>).type;
+            associateFuncsWithThisArgs((x as any));
             (x as Component<any, any>).init();
             (thisArg as any)['renderedChildren'].push(...x.renderChildren(currPath));
           } else if (!(x instanceof Component) && (x as any).type == undefined && (x as any).props == undefined) {
@@ -287,6 +299,8 @@ export abstract class Component<P, S> implements JSX.ElementClass {
     }
   }
   public constructor(props: P, state: S, key: string | number | null | undefined) {
+    console.log("CONSTRUCTOR");
+    console.log(props, state, key);
     if ((props as any).children != undefined) {
       this.props = props as P & PropsType;
     } else {
@@ -372,7 +386,9 @@ export class BaseAppComponent extends Component<any, any>{
 
   public renderApp() {
     this.renderedChildren = [];
-    this.userApp.renderChildren(undefined, this.tsxlightInstance);
+    let currPath = '/' + UserManager.getUserIDForRendererID(this.tsxlightInstance.instanceID as number) + '/' + PageManager.getCurrentPageIDForTsxID(this.tsxlightInstance.instanceID as number);
+    this.userApp.currentPath = currPath + '/' + this.userApp.type
+    this.userApp.renderChildren(this.userApp.currentPath, this.tsxlightInstance);
     this.hasRenderedApp = true;
     return this.userApp;
   }

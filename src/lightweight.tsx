@@ -57,7 +57,11 @@ class LightComponent2 extends Component<LightProps, LightState> {
   }
 
   public render() {
-    return <div id="someotherthing"><LightComponent className="help" yeet="off">some type of text!!</LightComponent></div>
+    let x = this.props.children ? this.props.children as any[] : [];
+    x.push(<LightComponent className="help" yeet="off">some type of text!!</LightComponent>);
+    console.log("RENDER");
+    console.log(x);
+    return <div id="someotherthing" children={x}></div>
   }
 
 }
@@ -73,7 +77,7 @@ class LightComponent3 extends Component<LightProps, LightState> {
   }
 
   public render() {
-    return <div id="pushItTotheLimit"><p style={{ fontSize: "24pt" }} onClick={this.toPageTwo}>Here to page 2!</p><LightComponent2 className="help123123" yeet="off245235">whateversdfasf!!</LightComponent2></div>
+    return <div id="pushItTotheLimit"><p style={{ fontSize: "24pt" }} onClick={this.toPageTwo}>Here to page 2!</p><LightComponent2 className="help123123" yeet="off245235"><p>whateversdfasf!!</p></LightComponent2></div>
   }
 
 }

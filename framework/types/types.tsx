@@ -7,8 +7,10 @@ export type DOMTreeTypes = JSX.Element | Component<any, any> | JSX.Element[] | n
 export type DOMTreeTypesDef = string | number | JSX.Element | Component<any, any> | JSX.Element[] | any;
 // TSX Prop Requirements START -------------------------------------------------
 
+export type ChildType = (JSXGenElType | JSX.Element | JSX.ElementClass | string | number | Function | undefined);
+
 export type PropsType = {
-  children?: any;
+  children?: ChildType | ChildType[];
 }
 
 // TSX Prop Requirements END ---------------------------------------------------
