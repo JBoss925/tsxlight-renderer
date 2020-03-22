@@ -12,6 +12,7 @@ import { CallbackManager } from '../managers/callbackManager';
 import { ServerManager } from '../managers/serverManager';
 import { userIDToSocket, socketFromUserID } from '../server/serverHandler';
 import { ScreenSize, ScreenSizeManager } from '../managers/screenSizeManager';
+import { isArray } from 'util';
 let fs = require('fs');
 
 type renderable = Component<any, any> | JSX.Element;
@@ -186,22 +187,34 @@ export class tsxlightinstance {
       tabStr += "\t";
     }
     let renderedStr = "";
+    let renderableCopy = [];
+    let toAddToCopy = [];
     for (let i = 0; i < renderableIn.length; i++) {
-      if (!(renderableIn[i] instanceof Component) && (renderableIn[i] as any).type == undefined && (renderableIn[i] as any).props == undefined) {
-        // It's a value!
-        renderedStr += ("\n" + tabStr + (renderableIn[i] as string | number | undefined));
+      if (isArray(renderableIn[i])) {
+        toAddToCopy.push(...(renderableIn[i] as Array<any>));
       }
-      if (renderableIn[i] instanceof Component) {
+      else {
+        renderableCopy.push(renderableIn[i]);
+      }
+    }
+    renderableCopy.push(...toAddToCopy);
+    for (let i = 0; i < renderableCopy.length; i++) {
+      if (!(renderableCopy[i] instanceof Component) && (renderableCopy[i] as any).type == undefined && (renderableCopy[i] as any).props == undefined) {
+        // It's a value!
+        console.log(renderableCopy[i]);
+        renderedStr += ("\n" + tabStr + (renderableCopy[i] as string | number | undefined));
+      }
+      if (renderableCopy[i] instanceof Component) {
         // If it's a component, return the recursed value of children
-        let renderComp = renderableIn[i] as Component<any, any>;
+        let renderComp = renderableCopy[i] as Component<any, any>;
         if (renderComp.renderedChildren.length <= 0) {
           renderedStr += "";
         } else {
-          renderedStr += this.compOrJSXToString(renderComp.renderedChildren, depth, renderableIn[i] as Component<any, any>);
+          renderedStr += this.compOrJSXToString(renderComp.renderedChildren, depth, renderableCopy[i] as Component<any, any>);
         }
       } else {
         // It's an element!
-        let element = renderableIn[i] as JSX.Element;
+        let element = renderableCopy[i] as JSX.Element;
         if (!(element instanceof Component) && (element as any).type != undefined && (element as any).props != undefined) {
           if (element.props.id == undefined) {
             element.key = (this.otherIDPref + this.otherIDInd);
@@ -302,6 +315,6 @@ export class tsxlightinstance {
     }
     this.otherIDInd = 0;
     this.currentRoot.innerHTML = this.compOrJSXToString(baseComponents, 3) as string;
-    return `\n\t<${this.currentRoot.tagName.toLowerCase()} id="tsxlight-app">${this.currentRoot.innerHTML}\n\t</${this.currentRoot.tagName.toLowerCase()}>`;
+    return `\n\t<${this.currentRoot.tagName.toLowerCase()} id="tsxlight-app" style="padding:0;margin:0;">${this.currentRoot.innerHTML}\n\t</${this.currentRoot.tagName.toLowerCase()}>`;
   }
 }

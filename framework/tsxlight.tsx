@@ -40,7 +40,7 @@ import { StateManager, PageCallback } from './managers/stateManager';
 import { tsxlightinstance } from './renderer/tsxRenderer';
 import { UserManager } from './managers/userManager';
 import { PageManager } from './managers/pageManager';
-import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType } from './types/types';
+import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType, RenderReturnType } from './types/types';
 import { ScreenSizeManager, ScreenSize } from './managers/screenSizeManager';
 
 export let window: BrowserWindow;
@@ -103,6 +103,7 @@ class TsxlightRenderManager {
     }
   }
   public registerPage(pageID: string, baseComponent: Component<any, any> | JSX.Element, onLoadPage: PageCallback, onUnloadPage: PageCallback) {
+    console.log(baseComponent.type);
     if (!(baseComponent instanceof Component)) {
       throw new Error("Tried to add page with root that isn't a component!")
     }
@@ -169,7 +170,7 @@ export abstract class Component<P, S> implements JSX.ElementClass {
   public state: any;
   public renderedChildren: ((DOMTreeTypesDef) | JSXGenElType | JSXGenElType[])[] = [];
   public key: string | number | null | undefined;
-  abstract render(): (JSXGenElType | JSXGenElType[]);
+  abstract render(): RenderReturnType;
   private getUserID(): string {
     return this.currentPath.split("/")[1];
   }
@@ -202,6 +203,9 @@ export abstract class Component<P, S> implements JSX.ElementClass {
           return [thisArg];
         }
         thisArg['renderedChildren'] = [];
+        if (thisArg.props == undefined) {
+          return thisArg['renderedChildren'];
+        }
         for (let n = 0; n < (thisArg as any).props.children.length; n++) {
           let x = (thisArg as any).props.children[n];
           if (x instanceof Component) {

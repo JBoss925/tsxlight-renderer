@@ -13,4 +13,6 @@ export type PropsType = {
   children?: ChildType | ChildType[];
 }
 
+export type RenderReturnType = JSX.ElementClass | JSX.Element | Component<any, any> | (JSX.ElementClass | JSX.Element | Component<any, any>);
+
 // TSX Prop Requirements END ---------------------------------------------------

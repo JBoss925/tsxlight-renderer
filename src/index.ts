@@ -3,7 +3,7 @@
 function main() {
 
   // TODO: Update mainClass to your app's main class!
-  let mainClass = require('./lightweight');
+  let mainClass = require('./components/appHolder');
   let expressClass = require('./expressIndex');
 }
 

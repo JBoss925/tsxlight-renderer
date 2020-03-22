@@ -3,9 +3,9 @@
   "mode": "express",
   "preferProcessPort": true,
   "port": "3000",
-  "baseURL": "test-tsx-server-renderer.herokuapp.com",
-  "useSecureSocket": true,
-  "includePortInClientSocketUrl": false,
+  "baseURL": "127.0.0.1",
+  "useSecureSocket": false,
+  "includePortInClientSocketUrl": true,
   "homepagePageID": "page1",
   "electronSettings": {
     "windowWidth": "50%",
