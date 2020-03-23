@@ -201,7 +201,6 @@ export class tsxlightinstance {
     for (let i = 0; i < renderableCopy.length; i++) {
       if (!(renderableCopy[i] instanceof Component) && (renderableCopy[i] as any).type == undefined && (renderableCopy[i] as any).props == undefined) {
         // It's a value!
-        console.log(renderableCopy[i]);
         renderedStr += ("\n" + tabStr + (renderableCopy[i] as string | number | undefined));
       }
       if (renderableCopy[i] instanceof Component) {

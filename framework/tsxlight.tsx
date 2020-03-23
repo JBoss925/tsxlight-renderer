@@ -103,7 +103,6 @@ class TsxlightRenderManager {
     }
   }
   public registerPage(pageID: string, baseComponent: Component<any, any> | JSX.Element, onLoadPage: PageCallback, onUnloadPage: PageCallback) {
-    console.log(baseComponent.type);
     if (!(baseComponent instanceof Component)) {
       throw new Error("Tried to add page with root that isn't a component!")
     }
@@ -208,18 +207,35 @@ export abstract class Component<P, S> implements JSX.ElementClass {
         }
         for (let n = 0; n < (thisArg as any).props.children.length; n++) {
           let x = (thisArg as any).props.children[n];
-          if (x instanceof Component) {
-            x['renderedChildren'] = [];
-            (x as Component<any, any>).currentPath = currPath + '/[' + n + ']' + (x as Component<any, any>).type;
-            (x as Component<any, any>).init();
-            (thisArg as any)['renderedChildren'].push(...x.renderChildren(currPath));
-          } else if (typeof (x) != "string" && typeof (x) != "number" && typeof (x) != "undefined") {
-            x['renderedChildren'] = [];
-            renderElChil(x);
-            // (x as any)['renderedChildren'].push(...renderElChil(x));
-            (thisArg as any)['renderedChildren'].push(x);
+          if (Array.isArray(x)) {
+            for (let z = 0; z < x.length; z++) {
+              let y = x[z];
+              if (y instanceof Component) {
+                y['renderedChildren'] = [];
+                (y as Component<any, any>).currentPath = currPath + '/[' + n + ']' + (y as Component<any, any>).type;
+                (y as Component<any, any>).init();
+                (thisArg as any)['renderedChildren'].push(...y.renderChildren(currPath));
+              } else if (!(y instanceof Component) && (y as any).type == undefined && (y as any).props == undefined) {
+                (thisArg as any)['renderedChildren'].push(y);
+              } else {
+                y['renderedChildren'] = [];
+                renderElChil(y);
+                (thisArg as any)['renderedChildren'].push(y);
+              }
+            }
           } else {
-            (thisArg as any)['renderedChildren'].push(x);
+            if (x instanceof Component) {
+              x['renderedChildren'] = [];
+              (x as Component<any, any>).currentPath = currPath + '/[' + n + ']' + (x as Component<any, any>).type;
+              (x as Component<any, any>).init();
+              (thisArg as any)['renderedChildren'].push(...x.renderChildren(currPath));
+            } else if (!(x instanceof Component) && (x as any).type == undefined && (x as any).props == undefined) {
+              (thisArg as any)['renderedChildren'].push(x);
+            } else {
+              x['renderedChildren'] = [];
+              renderElChil(x);
+              (thisArg as any)['renderedChildren'].push(x);
+            }
           }
         }
         return (thisArg as any)['renderedChildren'] as JSX.Element[];
@@ -229,10 +245,10 @@ export abstract class Component<P, S> implements JSX.ElementClass {
       return this.renderedChildren;
     }
     let x = (rendVal as any).props.children;
-    if (Array.isArray(rendVal)) {
-      this.props.children = rendVal;
+    if (Array.isArray(x)) {
+      this.props.children = x;
     } else {
-      this.props.children = [rendVal];
+      this.props.children = [x];
     }
     let childrenCopy = this.props.children;
     if (!Array.isArray(childrenCopy)) {
@@ -240,7 +256,14 @@ export abstract class Component<P, S> implements JSX.ElementClass {
       return this.renderedChildren;
     }
     for (let i = 0; i < childrenCopy.length; i++) {
-      this.doRecurseInst(childrenCopy[i] as any, currPath, i);
+      if (Array.isArray(childrenCopy[i])) {
+        for (let n = 0; n < (childrenCopy[i] as Array<any>).length; n++) {
+          this.doRecurseInst((childrenCopy[i] as Array<any>)[n] as any, currPath, n);
+        }
+      }
+      else {
+        this.doRecurseInst(childrenCopy[i] as any, currPath, i);
+      }
     }
     return this.renderedChildren;
   }
