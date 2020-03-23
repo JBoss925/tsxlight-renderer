@@ -8,7 +8,7 @@ const expandStyle: React.CSSProperties = { width: "100%", height: "100vh", backg
 export class CurrentConversation extends Component<any, any>{
 
   init() {
-    InternalEventManager.registerForEvent(clickRecentConvoEventTag, (event: ClickRecentConvoEvent) => {
+    this.registerForEvent(clickRecentConvoEventTag, (event: ClickRecentConvoEvent) => {
       console.log(event);
     }, this.type);
   }

@@ -42,6 +42,7 @@ import { UserManager } from './managers/userManager';
 import { PageManager } from './managers/pageManager';
 import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType, RenderReturnType } from './types/types';
 import { ScreenSizeManager, ScreenSize } from './managers/screenSizeManager';
+import { InternalEventManager } from './managers/internalEventManager';
 
 export let window: BrowserWindow;
 let windowShowRes: Function;
@@ -179,6 +180,12 @@ export abstract class Component<P, S> implements JSX.ElementClass {
   public transitionToPage(pageID: string) {
     tsxlight.transitionToPage(pageID, this.getUserID());
   }
+  public registerForEvent(tag: string, callback: ((event: any) => any), id?: string) {
+    InternalEventManager.registerForEvent(this.getUserID(), tag, callback, id);
+  }
+  public pushEvent(tag: string, event: any) {
+    InternalEventManager.pushEvent(this.getUserID(), tag, event);
+  }
   public renderChildren: (currPath?: string, tsx?: tsxlightinstance) => ((DOMTreeTypesDef) | JSXGenElType | JSXGenElType[])[] = (currPath?: string, tsx?: tsxlightinstance) => {
     if (currPath == undefined) {
       let z = Array.from((PageManager.pageIdToTsxIDToComponent.get(PageManager.getCurrentPageIDForTsxID(tsx?.instanceID as number)) as Map<number, Component<any, any>>).values()).filter(x => x.type == this.type);
@@ -212,7 +219,7 @@ export abstract class Component<P, S> implements JSX.ElementClass {
               let y = x[z];
               if (y instanceof Component) {
                 y['renderedChildren'] = [];
-                (y as Component<any, any>).currentPath = currPath + '/[' + n + ']' + (y as Component<any, any>).type;
+                (y as Component<any, any>).currentPath = currPath + '/[' + z + ']' + (y as Component<any, any>).type;
                 (y as Component<any, any>).init();
                 (thisArg as any)['renderedChildren'].push(...y.renderChildren(currPath));
               } else if (!(y instanceof Component) && (y as any).type == undefined && (y as any).props == undefined) {
@@ -332,9 +339,13 @@ export abstract class Component<P, S> implements JSX.ElementClass {
   public init() { };
   public afterRender() { };
   initState<K extends never>(state: any, callback?: (() => void) | undefined): void {
+    console.log(this.currentPath);
     if (StateManager.compStateHasInit(this.currentPath)) {
+      console.log("3")
       this.loadState();
     } else {
+      console.log('4')
+      console.log(state);
       this.state = state;
       this.saveState();
     }
