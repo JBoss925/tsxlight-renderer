@@ -1,10 +1,7 @@
-import { Request, Response } from 'express';
-import { tsxlight } from '../tsxlight';
 import { TSXSettings } from './settingsManager';
 import { Express } from 'express';
 import express from 'express';
 import expressws from 'express-ws';
-import * as http from 'http';
 
 export class ServerManager {
 

@@ -1,7 +1,3 @@
-import { tsxlightinstance } from "../renderer/tsxRenderer";
-import { Component } from "../tsxlight";
-import { userIDToSocket } from "../server/serverHandler";
-import { inspect } from 'util';
 import { CBPackage } from "../types/types";
 
 export class BaseHooks {

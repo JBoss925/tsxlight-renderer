@@ -1,7 +1,4 @@
-import { tsxlightinstance } from "../renderer/tsxRenderer";
-import { app } from "electron";
 const { screen } = require('electron');
-import settingsJsonRaw from './../settings.json';
 
 export type RawSettings = {
   // buildMode is either "dev", "desktopMac", "desktopWin", "desktopLin", "express"
@@ -137,7 +134,7 @@ export class TSXSettings {
     let elecSetRet = {} as ElectronSettings;
     if (elecRaw.windowHeight.endsWith("%") && (Number(elecRaw.windowHeight.substr(0, elecRaw.windowHeight.length - 1)) != undefined) && !isNaN(Number(elecRaw.windowHeight.substr(0, elecRaw.windowHeight.length - 1)))) {
       // We're a percent value, convert from screen size
-      const { width, height } = screen.getPrimaryDisplay().workAreaSize
+      const { width, height } = screen.getPrimaryDisplay().workAreaSize;
       let val = (Number(elecRaw.windowHeight.substr(0, elecRaw.windowHeight.length - 1)) / 100.0) * height;
       elecSetRet.windowHeight = val;
     } else if (elecRaw.windowHeight.endsWith("px") && (Number(elecRaw.windowHeight.substr(0, elecRaw.windowHeight.length - 2)) != undefined) && !isNaN(Number(elecRaw.windowHeight.substr(0, elecRaw.windowHeight.length - 2)))) {
@@ -148,7 +145,7 @@ export class TSXSettings {
     }
     if (elecRaw.windowWidth.endsWith("%") && (Number(elecRaw.windowWidth.substr(0, elecRaw.windowWidth.length - 1)) != undefined) && !isNaN(Number(elecRaw.windowWidth.substr(0, elecRaw.windowWidth.length - 1)))) {
       // We're a percent value, convert from screen size
-      const { width, height } = screen.getPrimaryDisplay().workAreaSize
+      const { width, height } = screen.getPrimaryDisplay().workAreaSize;
       let val = (Number(elecRaw.windowWidth.substr(0, elecRaw.windowWidth.length - 1)) / 100.0) * width;
       elecSetRet.windowWidth = val;
     } else if (elecRaw.windowWidth.endsWith("px") && (Number(elecRaw.windowWidth.substr(0, elecRaw.windowWidth.length - 2)) != undefined) && !isNaN(Number(elecRaw.windowWidth.substr(0, elecRaw.windowWidth.length - 2)))) {

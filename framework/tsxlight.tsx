@@ -1,6 +1,3 @@
-import { inspect } from 'util';
-import { v4 as uuidv4 } from 'uuid';
-
 // 5 things in this file:
 //   - Builds the electron window
 //   - The renderer manager

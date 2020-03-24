@@ -5,10 +5,7 @@ import { CallbackManager } from '../managers/callbackManager';
 import { TSXSettings, RenderMode } from '../managers/settingsManager';
 import { UserManager } from '../managers/userManager';
 import { PageManager } from '../managers/pageManager';
-import { WebsocketRequestHandler } from 'express-ws'
 import express from 'express';
-import expressws from 'express-ws';
-import core from 'express';
 import { ScreenSizeManager } from '../managers/screenSizeManager';
 import { BaseHooks } from '../managers/baseHooks';
 import { onClickHookID } from '../constants/constants';

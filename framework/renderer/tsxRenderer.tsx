@@ -1,16 +1,14 @@
 // TSX Renderer START ----------------------------------------------------------
 
 import { JSDOM } from 'jsdom';
-import { PageManager, PageCallback } from '../managers/pageManager';
-import { StateManager } from '../managers/stateManager';
+import { PageManager } from '../managers/pageManager';
 import { UserManager } from '../managers/userManager';
-import { InternalEventManager } from '../managers/internalEventManager';
-import { refreshWindow, Component, BaseAppComponent } from '../tsxlight';
+import { Component, BaseAppComponent } from '../tsxlight';
 import { TSXSettings, RenderMode } from '../managers/settingsManager';
 import { JSXGenElType } from '../types/types';
 import { CallbackManager } from '../managers/callbackManager';
 import { ServerManager } from '../managers/serverManager';
-import { userIDToSocket, socketFromUserID } from '../server/serverHandler';
+import { socketFromUserID } from '../server/serverHandler';
 import { ScreenSize, ScreenSizeManager } from '../managers/screenSizeManager';
 import { isArray } from 'util';
 let fs = require('fs');

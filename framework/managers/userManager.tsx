@@ -1,13 +1,4 @@
-// usermanager
-
 import { TSXSettings, RenderMode } from "./settingsManager";
-import { tsxlightinstance } from "../renderer/tsxRenderer";
-
-// currentUser -> user we're currently serving
-
-// user -> current renderered elt ids and callbacks
-// clear every rerender
-
 
 export class UserManager {
 

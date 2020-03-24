@@ -1,4 +1,3 @@
-import { tsxlightinstance } from "../renderer/tsxRenderer";
 import { Component } from "../tsxlight";
 
 export type PageCallback = (pageID: string, baseComponent: Component<any, any>) => any;

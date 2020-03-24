@@ -1,8 +1,3 @@
-import { tsxlightinstance } from "../renderer/tsxRenderer";
-import { Component } from "../tsxlight";
-import { userIDToSocket } from "../server/serverHandler";
-import { inspect } from 'util';
-
 export class CallbackManager {
 
   public static userIDToPageToCallback: Map<string, Map<string, Map<string, Function>>> = new Map<string, Map<string, Map<string, Function>>>();

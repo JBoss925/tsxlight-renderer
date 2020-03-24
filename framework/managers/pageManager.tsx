@@ -1,5 +1,4 @@
-import { tsxlight, Component } from "../tsxlight";
-import { StateManager } from "./stateManager";
+import { Component } from "../tsxlight";
 import { tsxlightinstance } from "../renderer/tsxRenderer";
 import { UserManager } from "./userManager";
 
