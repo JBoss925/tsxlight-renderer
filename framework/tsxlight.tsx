@@ -339,13 +339,9 @@ export abstract class Component<P, S> implements JSX.ElementClass {
   public init() { };
   public afterRender() { };
   initState<K extends never>(state: any, callback?: (() => void) | undefined): void {
-    console.log(this.currentPath);
     if (StateManager.compStateHasInit(this.currentPath)) {
-      console.log("3")
       this.loadState();
     } else {
-      console.log('4')
-      console.log(state);
       this.state = state;
       this.saveState();
     }

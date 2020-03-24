@@ -2,8 +2,9 @@ import { tsxlight, Component } from '../../framework/tsxlight';
 import { RenderReturnType } from '../../framework/types/types';
 import { InternalEventManager } from '../../framework/managers/internalEventManager';
 import { clickRecentConvoEventTag, ClickRecentConvoEvent } from '../constants/constants';
+import { Colors } from '../constants/colorPalettes';
 
-const expandStyle: React.CSSProperties = { width: "100%", height: "100vh", background: "red" };
+const expandStyle: React.CSSProperties = { width: "100%", height: "100vh", background: Colors.getScheme().backgroundCurrentConvo };
 
 export class CurrentConversation extends Component<any, any>{
 
