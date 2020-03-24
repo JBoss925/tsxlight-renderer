@@ -33,15 +33,66 @@ window.addEventListener("resize", (ev) => {
 let hasReturned = true;
 
 function callbackMessenger(event, id, eventType) {
-  let package = {
-    type: "callback",
-    targetID: id,
-    eventType: eventType
+  let packageVar;
+  if (id == "tsxlight-body" && eventType == 'onClick') {
+    packageVar = {
+      type: "callback",
+      targetID: id,
+      eventType: eventType,
+      event: {
+        isTrusted: true,
+        screenX: event.screenX,
+        screenY: event.screenY,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        ctrlKey: event.ctrlKey,
+        shiftKey: event.shiftKey,
+        altKey: event.altKey,
+        metaKey: event.metaKey,
+        button: event.button,
+        buttons: event.buttons,
+        relatedTarget: {
+          id: event.relatedTarget?.id
+        },
+        pageX: event.pageX,
+        pageY: event.pageY,
+        movementX: event.movementX,
+        movementY: event.movementY,
+        layerX: event.layerX,
+        layerY: event.layerY,
+        detail: event.detail,
+        sourceCapabilities: { firesTouchEvents: event.sourceCapabilities?.firesTouchEvents },
+        which: event.which,
+        type: event.type,
+        currentTarget: {
+          id: event.currentTarget?.id
+        },
+        eventPhase: event.eventPhase,
+        bubbles: event.bubbles,
+        cancelable: event.cancelable,
+        defaultPrevented: event.defaultPrevented,
+        composed: event.composed,
+        timeStamp: event.timeStamp,
+        returnValue: event.returnValue,
+        cancelBubble: event.cancelBubble,
+        target: {
+          id: event.target?.id
+        },
+        x: event.x,
+        y: event.y,
+        offsetX: event.offsetX,
+        offsetY: event.offsetY
+      }
+    }
+  } else {
+    packageVar = {
+      type: "callback",
+      targetID: id,
+      eventType: eventType,
+      event: undefined
+    }
   }
-  if (hasReturned) {
-    callbackExecutionChain.then(() => { websocket.send(JSON.stringify(package)) });
-    hasReturned = false;
-  }
+  callbackExecutionChain.then(() => { websocket.send(JSON.stringify(packageVar)) });
 }
 
 function replaceBodyWithNewAppRender(htmlString) {

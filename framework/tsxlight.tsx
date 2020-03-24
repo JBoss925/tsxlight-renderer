@@ -43,6 +43,8 @@ import { PageManager } from './managers/pageManager';
 import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType, RenderReturnType } from './types/types';
 import { ScreenSizeManager, ScreenSize } from './managers/screenSizeManager';
 import { InternalEventManager } from './managers/internalEventManager';
+import { BaseHooks } from './managers/baseHooks';
+import { onClickHookID } from './constants/constants';
 
 export let window: BrowserWindow;
 let windowShowRes: Function;
@@ -150,7 +152,9 @@ class TsxlightRenderManager {
     if (typeof (tagType) == "string") {
       let element = { type: tagType, props: props, key: props.id ? props.id : null } as JSX.Element;
       return element;
-    } else {
+    }
+    // if (typeof (tagType) == "function") 
+    else {
       let element = new tagType(props, {} as any, props.id ? props.id : null) as JSX.Element;
       return element;
     }
@@ -160,6 +164,20 @@ class TsxlightRenderManager {
 export let tsxlight = new TsxlightRenderManager();
 
 // TSX Renderer END ------------------------------------------------------------
+
+
+export class Events {
+
+  public static registerForOnClick(userID: string, callback: Function, componentPath: string) {
+    BaseHooks.registerCallback(userID, onClickHookID, componentPath, callback);
+  }
+
+  public static unregisterForOnClick(userID: string, componentPath: string) {
+    BaseHooks.unregisterCallback(userID, onClickHookID, componentPath);
+  }
+
+}
+
 
 // Component base START --------------------------------------------------------
 
@@ -171,7 +189,8 @@ export abstract class Component<P, S> implements JSX.ElementClass {
   public renderedChildren: ((DOMTreeTypesDef) | JSXGenElType | JSXGenElType[])[] = [];
   public key: string | number | null | undefined;
   abstract render(): RenderReturnType;
-  private getUserID(): string {
+  public events = Events;
+  public getUserID(): string {
     return this.currentPath.split("/")[1];
   }
   public getScreenSize(): ScreenSize {
@@ -433,3 +452,22 @@ export class BaseAppComponent extends Component<any, any>{
 }
 
 // BaseAppComonent END ---------------------------------------------------------
+
+class WrapperComponent extends Component<any, any>{
+
+  public childComp: any;
+
+  constructor(props: any, state: any, id: string | number | null, childComp: any) {
+    super(props, state, id);
+    this.childComp = childComp;
+  }
+
+  render(): RenderReturnType {
+    if (this.childComp == undefined) {
+      return { type: "p", props: {}, key: null } as JSX.Element;
+    } else {
+      return this.childComp.render(this.props, this.state);
+    }
+  }
+
+}

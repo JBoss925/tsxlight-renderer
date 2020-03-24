@@ -16,3 +16,48 @@ export type PropsType = {
 export type RenderReturnType = JSX.ElementClass | JSX.Element | Component<any, any> | (JSX.ElementClass | JSX.Element | Component<any, any>);
 
 // TSX Prop Requirements END ---------------------------------------------------
+
+export type MouseEvent = {
+  isTrusted: boolean,
+  screenX: number,
+  screenY: number,
+  clientX: number,
+  clientY: number,
+  ctrlKey: boolean,
+  shiftKey: boolean,
+  altKey: boolean,
+  metaKey: boolean,
+  button: number,
+  buttons: number,
+  relatedTarget: any,
+  pageX: number,
+  pageY: number,
+  movementX: number,
+  movementY: number,
+  layerX: number,
+  layerY: number,
+  detail: number,
+  sourceCapabilities: { firesTouchEvents: boolean },
+  which: number,
+  type: string,
+  currentTarget: { id: string },
+  eventPhase: number,
+  bubbles: boolean,
+  cancelable: boolean,
+  defaultPrevented: boolean,
+  composed: boolean,
+  timeStamp: number,
+  returnValue: boolean,
+  cancelBubble: boolean,
+  target: { id: string },
+  x: number,
+  y: number,
+  offsetX: number,
+  offsetY: number
+}
+
+export type CBPackage = {
+  targetID: string,
+  eventType: string
+  event: any
+};

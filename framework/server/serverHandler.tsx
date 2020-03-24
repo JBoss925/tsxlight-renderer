@@ -10,12 +10,10 @@ import express from 'express';
 import expressws from 'express-ws';
 import core from 'express';
 import { ScreenSizeManager } from '../managers/screenSizeManager';
+import { BaseHooks } from '../managers/baseHooks';
+import { onClickHookID } from '../constants/constants';
+import { CBPackage } from '../types/types';
 let fs = require('fs');
-
-type Package = {
-  targetID: string,
-  eventType: string
-};
 
 let connIndex = 0;
 
@@ -141,7 +139,7 @@ function close(socket: any) {
   }
 }
 
-function callbackMessenger(socket: any, cbPackage: Package) {
+function callbackMessenger(socket: any, cbPackage: CBPackage) {
   let usrID = (socket as any)['userID'] as string;
   let callbackID: string = "";
   callbackID += "/";
@@ -149,15 +147,22 @@ function callbackMessenger(socket: any, cbPackage: Package) {
   callbackID += "/";
   callbackID += cbPackage.eventType
   let currPageID = PageManager.getCurrentPageIDForTsxID(UserManager.getRendererIDForUserID(usrID));
-  if (tsxlight.userIDtoRenderer.has(usrID)) {
-    CallbackManager.callCallback(usrID, currPageID, callbackID);
+  if (callbackID == "/tsxlight-body/onClick") {
+    // Handle general onClick
+    BaseHooks.callCallbacks(usrID, onClickHookID, cbPackage);
     CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
     tsxlight.rerender(usrID);
   } else {
-    CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
-    tsxlight.rerender(usrID);
-    CallbackManager.callCallback(usrID, currPageID, callbackID);
-    CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
-    tsxlight.rerender(usrID);
+    if (tsxlight.userIDtoRenderer.has(usrID)) {
+      CallbackManager.callCallback(usrID, currPageID, callbackID);
+      CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
+      tsxlight.rerender(usrID);
+    } else {
+      CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
+      tsxlight.rerender(usrID);
+      CallbackManager.callCallback(usrID, currPageID, callbackID);
+      CallbackManager.clearCallbacksForUserIDPageID(usrID, currPageID);
+      tsxlight.rerender(usrID);
+    }
   }
 }
