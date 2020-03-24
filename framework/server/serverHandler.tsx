@@ -7,7 +7,7 @@ import { UserManager } from '../managers/userManager';
 import { PageManager } from '../managers/pageManager';
 import express from 'express';
 import { ScreenSizeManager } from '../managers/screenSizeManager';
-import { BaseHooks } from '../managers/baseHooks';
+import { BaseHooks } from '../managers/baseHooksManager';
 import { onClickHookID } from '../constants/constants';
 import { CBPackage } from '../types/types';
 let fs = require('fs');

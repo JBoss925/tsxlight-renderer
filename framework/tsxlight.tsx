@@ -40,7 +40,7 @@ import { PageManager } from './managers/pageManager';
 import { DOMTreeTypesDef, JSXGenElType, DOMTreeTypes, PropsType, RenderReturnType } from './types/types';
 import { ScreenSizeManager, ScreenSize } from './managers/screenSizeManager';
 import { InternalEventManager } from './managers/internalEventManager';
-import { BaseHooks } from './managers/baseHooks';
+import { BaseHooks } from './managers/baseHooksManager';
 import { onClickHookID } from './constants/constants';
 
 export let window: BrowserWindow;
