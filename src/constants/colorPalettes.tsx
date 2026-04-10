@@ -11,7 +11,12 @@ export type ColorsType = {
   messageBubbleYouColors: string[],
   messageBubbleOtherColors: string[],
   recentConvoLastMessageTextColor: string,
-  recentConvoNamesColor: string
+  recentConvoNamesColor: string,
+  shellBackground: string,
+  panelBorderColor: string,
+  mutedTextColor: string,
+  accentGradientStart: string,
+  accentGradientEnd: string
 }
 
 export class Colors {
@@ -30,22 +35,32 @@ export class Colors {
       messageTextYouColors: ["#ffffff"],
       messageTextOtherColors: ["#ffffff"],
       sendMessageButtonColor: "#ffb6b9",
-      iconHighlightColor: "#ffb6b9"
+      iconHighlightColor: "#ffb6b9",
+      shellBackground: "#fff5f2",
+      panelBorderColor: "#f4c7c8",
+      mutedTextColor: "#93666a",
+      accentGradientStart: "#ff9aa2",
+      accentGradientEnd: "#ff7b8a"
     }],
     ['default', {
-      backgroundCurrentConvo: "#ffffff",
-      backgroundMessageBar: "#eefff2",
-      backgroundRecentConvo: "#ffffff",
-      backgroundRecentConvoSelected: "#d6fdff",
-      backgroundRecentConvosBar: "#f3f7f7",
-      recentConvoLastMessageTextColor: "#000000",
-      recentConvoNamesColor: "#000000",
-      messageBubbleYouColors: ["#eefff2"],
-      messageBubbleOtherColors: ["#deffef"],
-      messageTextYouColors: ["#000000"],
-      messageTextOtherColors: ["#000000"],
-      sendMessageButtonColor: "#deffef",
-      iconHighlightColor: "ffb6b9"
+      backgroundCurrentConvo: "#fff8f1",
+      backgroundMessageBar: "#fff2e2",
+      backgroundRecentConvo: "#fffaf5",
+      backgroundRecentConvoSelected: "#ffd6ad",
+      backgroundRecentConvosBar: "#fff1df",
+      recentConvoLastMessageTextColor: "#7f5a33",
+      recentConvoNamesColor: "#1f1308",
+      messageBubbleYouColors: ["#ffedd8"],
+      messageBubbleOtherColors: ["#ffffff"],
+      messageTextYouColors: ["#3f240a"],
+      messageTextOtherColors: ["#352012"],
+      sendMessageButtonColor: "#ff9f43",
+      iconHighlightColor: "#ff9f43",
+      shellBackground: "#fff7ee",
+      panelBorderColor: "#f3cfaa",
+      mutedTextColor: "#926c48",
+      accentGradientStart: "#ff9a3c",
+      accentGradientEnd: "#ff6b2d"
     }]
   ]);
 

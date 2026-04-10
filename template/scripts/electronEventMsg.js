@@ -15,7 +15,9 @@ window.addEventListener('load', function () {
 });
 
 window.addEventListener('close', function () {
-  ws.close();
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.close();
+  }
 });
 
 let windowSizeSampleRateMS = 100;
@@ -25,7 +27,9 @@ window.addEventListener("resize", (ev) => {
   // Possible sample rate limiting code
   // if (Date.now() - lastSample > windowSizeSampleRateMS) {
   let screenInfo = { type: "screenSize", width: window.innerWidth, height: window.innerHeight };
-  websocket.send(JSON.stringify(screenInfo));
+  if (websocket && websocket.readyState === WebSocket.OPEN) {
+    websocket.send(JSON.stringify(screenInfo));
+  }
   // lastSample = Date.now();
   // }
 });
@@ -92,7 +96,11 @@ function callbackMessenger(event, id, eventType) {
       event: undefined
     }
   }
-  callbackExecutionChain.then(() => { websocket.send(JSON.stringify(packageVar)) });
+  callbackExecutionChain.then(() => {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+      websocket.send(JSON.stringify(packageVar));
+    }
+  });
 }
 
 function replaceBodyWithNewAppRender(htmlString) {
@@ -109,7 +117,12 @@ function startUpWebSocket() {
   if (settings.mode == 0) {
     url = (protocol + "://127.0.0.1:3000/");
   } else {
-    url = (protocol + "://" + settings.baseURL + (!settings.includePortInClientSocketUrl ? "" : (":" + (settings.processPort ? settings.processPort : settings.port))) + "/");
+    let browserHost = window.location.host;
+    if (browserHost && browserHost.length > 0) {
+      url = protocol + "://" + browserHost + "/";
+    } else {
+      url = (protocol + "://" + settings.baseURL + (!settings.includePortInClientSocketUrl ? "" : (":" + (settings.processPort ? settings.processPort : settings.port))) + "/");
+    }
   }
   let ws = new WebSocket(url);
   ws.onopen = function (event) {
