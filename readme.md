@@ -1,25 +1,98 @@
-## TSXLight
+# TSXLight Renderer
 
-TSXLight is a proof of concept, react-style server-side rendering engine for the web and electron. It works based on a base component class which can be extended and used with a custom JSX factory. The framework also keeps track of current users of the system and gives them each an individual renderer. Each individual renderer has its own state, its own line of communication with the user, its own callbacks, etc. This separates each of the users' systems from one another. The pages that are sent to the user are shells with the information already resolved, and a small callback script to trigger callbacks on the server via a socket. Additionally, TSXLight provides a few more features on top of the react-style component tree, with a built in event emitter system and the like.
+TSXLight Renderer is a server-owned TSX rendering experiment for web and Electron shells. Components are authored with a React-like TSX syntax and a custom JSX factory, but component instances, state, callbacks, page transitions, and rerender decisions live on the server.
 
-Much like react, it has some lifecycle hooks. Although there are fewer restrictions in terms of when you can perform specific operations, so the lifecycle hooks are fairly unneeded, and the only real hook is the afterRender() hook which is called once the component is rendered.
+## Architecture
 
-## Some unique choices
+- Custom TSX/JSX factory for component authoring.
+- Server-side component tree rendering into HTML shells.
+- Per-user renderer instances with isolated state and callback tables.
+- Socket-routed client events that invoke server-owned callbacks.
+- Page manager for registered pages, active page IDs, load/unload hooks, and transitions.
+- State save/load hooks for persistence across renders and page changes.
+- Screen-size tracking for user-specific layout decisions.
+- Electron and web shell support.
+- Juice Messenger sample application surface.
 
-TSXLight also has a few unique choices. The settings.json file controls most of these unique base settings. For instance, the renderer can be set to have at most 1 active connection per user, and upon opening a duplicate tab it will invalidate the other tab until that tab is refreshed (at which point the new tab will be invalidated). 
+## Requirements
 
-TSXLight also builds a page system on top of the component tree. The idea is that the page is registered under an ID, and that ID can be used from anywhere in the app to transition to that page with callbacks for when the page loads and unloads to handle custom transition logic.
+This is an older TypeScript/Node experiment. Use an older Node line if modern dependency resolution causes issues.
 
-Additionally TSXLight comes prebuilt with a state store. This means that state can easily persist between renders by using the saveState() and loadState() hooks, which also rerenders the components. To rerender without saving state in the store, the forceUpdate() function can be used.
+- Node.js and npm
+- TypeScript / ts-node through local dependencies
+- Electron for the desktop shell path
 
+Avoid global installs unless needed for legacy local workflows; the repository declares the required packages in `package.json`.
 
-## Juice Messenger
-As a proof of concept, I have implemented a placeholder app with basic logic, called Juice Messenger. It demonstrates how callbacks work, how the component tree re-renders upon state changes, and how it is quite similar to react.
+## Setup
 
+```bash
+npm install
+```
 
-## Need these globally (may need to sudo if access is denied for any reason):
+## Runbook
 
-#### npm i --g typescript
-#### npm i --g ts-node
-#### npm i --g node
-#### npm i --g electron
+Start the server/web renderer:
+
+```bash
+npm start
+```
+
+Run in watch mode:
+
+```bash
+npm run start:watch
+```
+
+Start the Electron shell:
+
+```bash
+npm run electronStart
+```
+
+Compile TypeScript/TSX using the custom JSX factory:
+
+```bash
+npm run compile
+```
+
+## Important Scripts
+
+- `npm start`: runs `ts-node ./src`.
+- `npm run start:watch`: runs the nodemon watch loop.
+- `npm run electronStart`: starts Electron.
+- `npm run compile`: compiles TSX with `tsxlight.createElement` as the JSX factory.
+
+The `test` script is currently a placeholder and exits with an error.
+
+## Runtime Model
+
+Each connected user receives a renderer instance:
+
+```text
+user -> rendererId -> active page -> component instance -> callback table
+```
+
+The browser receives rendered markup plus a small callback bridge. When a user interacts with an element, the client sends a socket message containing renderer/page/callback identity. The server validates the message, invokes the stored callback, mutates server-side component state, and rerenders the shell for that renderer.
+
+## Page and State Flow
+
+Page transitions follow this shape:
+
+```text
+save outgoing page state
+run outgoing unload hook
+select next page for renderer
+load or create renderer-local component instance
+render next shell
+run incoming load/afterRender hook
+```
+
+Use `saveState()` and `loadState()` to persist component data across renders. Use `forceUpdate()` when a rerender should occur without saving state into the store.
+
+## Troubleshooting
+
+- If TSX does not compile, confirm the compile command includes `--jsxFactory tsxlight.createElement`.
+- If callbacks fire for stale elements, clear/regenerate the callback table during rerender.
+- If multiple tabs interfere, check the settings that control duplicate active connections per user.
+- If modern Node versions produce dependency issues, retry with an older Node version compatible with TypeScript 3.8 and Electron 8.
